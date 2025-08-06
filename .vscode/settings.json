@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "InteractVille.sln"
+    "dotnet.defaultSolution": "InteractVille2.sln"
 }

@@ -21033,10 +21033,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: "\u308F\u305F\u3057\u306F\u3071\u3080\u3059\u305F\u30FC\u3060\u3088\u3002"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e78749a606240f34c8b5f1e441d62327, type: 2}
-  m_sharedMaterial: {fileID: -6466497631386045734, guid: e78749a606240f34c8b5f1e441d62327, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0a3552fb47f90184691f9cb663f77be3, type: 2}
+  m_sharedMaterial: {fileID: -20605772150529815, guid: 0a3552fb47f90184691f9cb663f77be3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -21128,8 +21128,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: -31.054, y: -22.15}
+  m_SizeDelta: {x: 468.71, y: 92.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &861371401
 GameObject:
@@ -21766,10 +21766,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u304B"
+  m_text: "\u3071\u3080\u3059\u305F\u30FC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e78749a606240f34c8b5f1e441d62327, type: 2}
-  m_sharedMaterial: {fileID: -6466497631386045734, guid: e78749a606240f34c8b5f1e441d62327, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0a3552fb47f90184691f9cb663f77be3, type: 2}
+  m_sharedMaterial: {fileID: -20605772150529815, guid: 0a3552fb47f90184691f9cb663f77be3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
