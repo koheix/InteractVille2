@@ -221,7 +221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextSceneName: HouseScene
-  requireInput: 1
+  requireInput: 0
 --- !u!61 &129407002
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -21421,7 +21421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextSceneName: HouseScene
-  requireInput: 1
+  requireInput: 0
 --- !u!61 &987633795
 BoxCollider2D:
   m_ObjectHideFlags: 0
