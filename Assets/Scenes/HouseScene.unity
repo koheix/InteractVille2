@@ -21025,7 +21025,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10147218640d7b3418e6b38cd8d7252f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextSceneName: SampleScene
+  nextSceneName: MainGameScene
   requireInput: 0
 --- !u!61 &987633795
 BoxCollider2D:
