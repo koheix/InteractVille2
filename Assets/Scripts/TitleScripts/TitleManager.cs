@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class TitleManager : MonoBehaviour
 {
@@ -13,8 +14,9 @@ public class TitleManager : MonoBehaviour
     [Header("BGM設定")]
     [SerializeField] private AudioSource bgmAudioSource;
     [SerializeField] private AudioClip titleBGM;
-    
+
     [Header("設定パネル内容")]
+    [SerializeField] private InputField apiKeyInput;
     [SerializeField] private Slider bgmVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Button settingsCloseButton;
@@ -41,7 +43,7 @@ public class TitleManager : MonoBehaviour
             
         if (settingsCloseButton != null)
             settingsCloseButton.onClick.AddListener(OnSettingsCloseButtonClicked);
-        
+
         // 設定パネルを初期状態では非表示にする
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
@@ -73,9 +75,17 @@ public class TitleManager : MonoBehaviour
     private void LoadSettings()
     {
         // 保存された設定値を読み込み
+        String apiKey = PlayerPrefs.GetString("APIKey");
         float bgmVolume = PlayerPrefs.GetFloat("BGMVolume", 0.7f);
         float sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 0.7f);
-        
+
+
+        if (apiKeyInput != null)
+        {
+            apiKeyInput.text = apiKey;
+            apiKeyInput.onValueChanged.AddListener(OnAPIKeyChanged);
+        }
+
         if (bgmVolumeSlider != null)
         {
             bgmVolumeSlider.value = bgmVolume;
@@ -125,17 +135,24 @@ public class TitleManager : MonoBehaviour
         // 設定を保存
         SaveSettings();
     }
+
+    // API Keyが更新されたとき
+    private void OnAPIKeyChanged(String value)
+    {
+        Debug.Log("API Keyが入力されました");
+        PlayerPrefs.SetString("APIKey", value);
+    }
     
     // 終了ボタンクリック時の処理
     private void OnExitButtonClicked()
     {
         Debug.Log("ゲームを終了します");
-        
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
             Application.Quit();
-        #endif
+#endif
     }
     
     // BGM音量変更時の処理
