@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using TMPro;
 
 public class TitleManager : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private AudioClip titleBGM;
 
     [Header("設定パネル内容")]
-    [SerializeField] private InputField apiKeyInput;
+    [SerializeField] private TMP_InputField apiKeyInput;
     [SerializeField] private Slider bgmVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Button settingsCloseButton;
@@ -193,27 +194,29 @@ public class TitleManager : MonoBehaviour
         bgmAudioSource.Stop();
         bgmAudioSource.volume = startVolume;
     }
-    
+
     // ゲーム終了時の処理
     private void OnDestroy()
     {
         // イベントリスナーのクリーンアップ
         if (startButton != null)
             startButton.onClick.RemoveListener(OnStartButtonClicked);
-            
+
         if (settingsButton != null)
             settingsButton.onClick.RemoveListener(OnSettingsButtonClicked);
-            
+
         if (exitButton != null)
             exitButton.onClick.RemoveListener(OnExitButtonClicked);
-            
+
         if (settingsCloseButton != null)
             settingsCloseButton.onClick.RemoveListener(OnSettingsCloseButtonClicked);
-            
+
         if (bgmVolumeSlider != null)
             bgmVolumeSlider.onValueChanged.RemoveListener(OnBGMVolumeChanged);
-            
+
         if (sfxVolumeSlider != null)
             sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
+        if (apiKeyInput != null)
+            apiKeyInput.onValueChanged.RemoveListener(OnAPIKeyChanged);
     }
 }

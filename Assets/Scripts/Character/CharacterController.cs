@@ -2,6 +2,11 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+
+/*
+characterの動きを制御するためのコード
+歩数も記録する
+*/
 public class CharacterController : MonoBehaviour
 {
     public float moveSpeed = 2f;
@@ -9,16 +14,31 @@ public class CharacterController : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 moveInput;
 
+    // 歩行距離計測用の変数
+    private Vector3 lastPosition;
+    private float totalWalkDistance = 0f;
+
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();  // Rigidbody2D を取得
         rb.gravityScale = 0;  // 重力を無効化
         rb.freezeRotation = true;  // 回転を固定
+
+        // 初期位置を記録
+        lastPosition = transform.position;
     }
 
     void Update()
     {
+
+        // 移動距離を計算
+        float distanceThisFrame = Vector3.Distance(transform.position, lastPosition);
+        totalWalkDistance += distanceThisFrame;
+        lastPosition = transform.position;
+
+        // Debug.Log($"総移動距離: {totalWalkDistance:F2}");
+
         // 入力処理（Raw を使うとキビキビした動きになる）
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
@@ -51,5 +71,31 @@ public class CharacterController : MonoBehaviour
     {
         // Rigidbody2D で移動する（transform.position ではなく velocity を使う）
         rb.linearVelocity = moveInput * moveSpeed;
+
+        // //体力が減っていたらスピードを遅くする
+        // if (PlayerPrefs.GetInt("hunger", 100) > 60)
+        // {
+        //     moveSpeed = 2f;
+        // }
+        // else if (PlayerPrefs.GetInt("hunger", 100) > 30)
+        // {
+        //     moveSpeed = 1.8f;
+        // }
+        // else
+        // {
+        //     moveSpeed = 1.7f;
+        // }
+    }
+
+    // 外部から歩行距離を取得するメソッド
+    public float GetTotalWalkDistance()
+    {
+        return totalWalkDistance;
+    }
+
+    // 歩行距離をリセットするメソッド
+    public void ResetWalkDistance()
+    {
+        totalWalkDistance = 0f;
     }
 }

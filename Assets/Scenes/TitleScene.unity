@@ -1573,7 +1573,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 1007007771}
   bgmAudioSource: {fileID: 320864201}
   titleBGM: {fileID: 8300000, guid: b982b85c3f47bab4e923d44d5acb1ca8, type: 3}
-  apiKeyInput: {fileID: 0}
+  apiKeyInput: {fileID: 1247226057}
   bgmVolumeSlider: {fileID: 1545390214}
   sfxVolumeSlider: {fileID: 1467213312}
   settingsCloseButton: {fileID: 529172119}
