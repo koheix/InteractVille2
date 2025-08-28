@@ -9,7 +9,8 @@ characterの動きを制御するためのコード
 */
 public class CharacterController : MonoBehaviour
 {
-    public float moveSpeed = 2f;
+    [Header("player speed")]
+    [SerializeField] private float moveSpeed = 5f;
     private Animator animator;
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -72,19 +73,19 @@ public class CharacterController : MonoBehaviour
         // Rigidbody2D で移動する（transform.position ではなく velocity を使う）
         rb.linearVelocity = moveInput * moveSpeed;
 
-        // //体力が減っていたらスピードを遅くする
-        // if (PlayerPrefs.GetInt("hunger", 100) > 60)
-        // {
-        //     moveSpeed = 2f;
-        // }
-        // else if (PlayerPrefs.GetInt("hunger", 100) > 30)
-        // {
-        //     moveSpeed = 1.8f;
-        // }
-        // else
-        // {
-        //     moveSpeed = 1.7f;
-        // }
+        //体力が減っていたらスピードを遅くする
+        if (PlayerPrefs.GetInt("hunger", 100) > 60)
+        {
+            moveSpeed = 5f;
+        }
+        else if (PlayerPrefs.GetInt("hunger", 100) > 30)
+        {
+            moveSpeed = 4f;
+        }
+        else
+        {
+            moveSpeed = 3f;
+        }
     }
 
     // 外部から歩行距離を取得するメソッド

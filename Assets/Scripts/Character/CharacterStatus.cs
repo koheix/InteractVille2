@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+// using Microsoft.Unity.VisualStudio.Editor;
+using UnityEngine.UI;
 
 /*
 characterのステータスを演算するコード
@@ -12,8 +12,13 @@ public class CharacterStatus : MonoBehaviour
     private int hunger;
     private CharacterController cc;
 
+    [Header("体力のUI")]
+    [SerializeField] private Image hungerGauge;
+
     void Start()
     {
+        // for test
+        PlayerPrefs.SetInt("hunger", 100);
         cc = GetComponent<CharacterController>();
         //体力のロード
         if (PlayerPrefs.HasKey("hunger"))
@@ -31,15 +36,28 @@ public class CharacterStatus : MonoBehaviour
 
     void Update()
     {
-        // Debug.Log(hunger);
-        // Debug.Log("playerpref hunger: " + PlayerPrefs.GetInt("hunger"));
-        //とりあえず単純に歩数が定数の閾値を超えたら体力を減らす
-        // if (cc.GetTotalWalkDistance() > 10)
-        // {
-        //     hunger -= 10;
-        //     PlayerPrefs.SetInt("hunger", hunger);
-        //     cc.ResetWalkDistance();
-        // }
+        Debug.Log(hunger);
+        Debug.Log("playerpref hunger: " + PlayerPrefs.GetInt("hunger"));
+        // 単純に歩数が定数の閾値を超えたら体力を減らす
+        if (cc.GetTotalWalkDistance() > 1)
+        {
+            //体力を減らす
+            hunger = Mathf.Clamp(--hunger, 0, 100);
+            PlayerPrefs.SetInt("hunger", hunger);
+            cc.ResetWalkDistance();
+            // statusのUIに反映
+            hungerGauge.fillAmount = hunger / 100f;
+            if (hunger > 60)
+            {
+                hungerGauge.color = Color.green;
+            }
+            else if (hunger > 30) {
+                hungerGauge.color = Color.yellow;
+            }
+            else {
+                hungerGauge.color = Color.red;
+            }
+        }
     }
 
     void FixedUpdate()
