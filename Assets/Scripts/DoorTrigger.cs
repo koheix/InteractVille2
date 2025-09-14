@@ -28,13 +28,13 @@ public class DoorTrigger : MonoBehaviour
         //入った位置を記録
         Vector3 playerPos = other.transform.position;
         //前の場所
-        if (prevSceneName == "SampleScene")
+        if (prevSceneName == "MainGameScene")
         {
         PlayerPrefs.SetFloat("prevPlayerX", playerPos.x);
         PlayerPrefs.SetFloat("prevPlayerY", playerPos.y - 1.0f);
         }
 
-        if (nextSceneName == "SampleScene")
+        if (nextSceneName == "MainGameScene")
         {
             float x = PlayerPrefs.GetFloat("prevPlayerX");
             float y = PlayerPrefs.GetFloat("prevPlayerY");

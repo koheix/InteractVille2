@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      hunger_gauge_0: -3086481258377593584
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
