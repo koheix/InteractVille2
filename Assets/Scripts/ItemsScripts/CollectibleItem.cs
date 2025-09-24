@@ -71,6 +71,17 @@ public class CollectibleItem : MonoBehaviour
         {
             inventory.AddItem(itemName, itemValue);
         }
+        //暫定的に実装（後で修正するかも）
+        try
+        {
+            //ゲットしたリンゴを増やす処理
+            PlayerPrefs.SetInt("appleCount", PlayerPrefs.GetInt("appleCount") + 1);   
+        }
+        catch (System.Exception)
+        {
+            //エラー処理を後で書く
+            throw;
+        }
 
         // // GameManagerに通知
         // GameManager.Instance?.OnItemCollected(itemName, itemValue);

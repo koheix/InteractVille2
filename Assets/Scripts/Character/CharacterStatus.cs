@@ -1,6 +1,7 @@
 using UnityEngine;
 // using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine.UI;
+using TMPro;
 
 /*
 characterのステータスを演算するコード
@@ -15,10 +16,18 @@ public class CharacterStatus : MonoBehaviour
     [Header("体力のUI")]
     [SerializeField] private Image hungerGauge;
 
+    [Header("りんごのUI")]
+    [SerializeField] private TextMeshProUGUI appleCountUI;
+    //リンゴの数
+    private int appleCount;
+
     void Start()
     {
         // for test
         PlayerPrefs.SetInt("hunger", 100);
+
+        appleCount = PlayerPrefs.GetInt("appleCount", 0);
+
         cc = GetComponent<CharacterController>();
         //体力のロード
         if (PlayerPrefs.HasKey("hunger"))
@@ -38,6 +47,7 @@ public class CharacterStatus : MonoBehaviour
     {
         Debug.Log(hunger);
         Debug.Log("playerpref hunger: " + PlayerPrefs.GetInt("hunger"));
+        
         // 単純に歩数が定数の閾値を超えたら体力を減らす
         if (cc.GetTotalWalkDistance() > 1)
         {
@@ -58,6 +68,10 @@ public class CharacterStatus : MonoBehaviour
                 hungerGauge.color = Color.red;
             }
         }
+
+        //リンゴの数をUIに反映
+        appleCount = PlayerPrefs.GetInt("appleCount", 0);
+        appleCountUI.text = appleCount.ToString();
     }
 
     void FixedUpdate()
