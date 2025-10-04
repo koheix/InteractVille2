@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 /*
 characterの動きを制御するためのコード
-歩数も記録する
+歩行距離を計測する
 */
 public class CharacterController : MonoBehaviour
 {

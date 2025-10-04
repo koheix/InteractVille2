@@ -26648,6 +26648,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hungerGauge: {fileID: 454990581}
   appleCountUI: {fileID: 1938827279}
+  hungerRecoveryInterval: 0.1
+  hungerRecoveryAmount: 1
 --- !u!1 &2097928058
 GameObject:
   m_ObjectHideFlags: 0
