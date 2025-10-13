@@ -14,10 +14,9 @@ public class ShopperDialogueSystem : DialogueSystem
 
     }
 
-    @Override
-    public void StartDialogue()
-    {
-        base.StartDialogue();
-        // ここにShopperDialogueSystem固有の処理を追加
-    }   
+    // public void StartDialogue()
+    // {
+    //     base.StartDialogue();
+    //     // ここにShopperDialogueSystem固有の処理を追加
+    // }   
 }
