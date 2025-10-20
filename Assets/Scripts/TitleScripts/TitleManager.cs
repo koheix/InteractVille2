@@ -16,11 +16,12 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private AudioSource bgmAudioSource;
     [SerializeField] private AudioClip titleBGM;
 
-    [Header("設定パネル内容")]
+    [Header("設定内容")]
     [SerializeField] private TMP_InputField apiKeyInput;
     [SerializeField] private Slider bgmVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Button settingsCloseButton;
+    [SerializeField] private TMP_InputField userNameInput;
     
     [Header("シーン設定")]
     [SerializeField] private string gameSceneName = "GameScene";
@@ -101,13 +102,30 @@ public class TitleManager : MonoBehaviour
         
         // BGM音量を適用
         if (bgmAudioSource != null)
+        {
             bgmAudioSource.volume = bgmVolume;
+        }
     }
     
     // スタートボタンクリック時の処理
     private void OnStartButtonClicked()
     {
+
+        Debug.Log(userNameInput.text);
+        //プレイヤーの名前をロード
+        if (userNameInput.text == null || userNameInput.text == "")
+        {
+            //ポップアップとかで出すようにする
+            Debug.Log("なまえをいれてね");
+            return;
+        }
+        else
+        {
+            PlayerPrefs.SetString("userName", userNameInput.text);
+        }
+
         Debug.Log("ゲームを開始します");
+
         
         // BGMをフェードアウト（オプション）
         StartCoroutine(FadeOutBGM(1.0f));
