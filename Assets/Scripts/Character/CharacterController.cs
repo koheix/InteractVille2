@@ -74,11 +74,12 @@ public class CharacterController : MonoBehaviour
         rb.linearVelocity = moveInput * moveSpeed;
 
         //体力が減っていたらスピードを遅くする
-        if (PlayerPrefs.GetInt("hunger", 100) > 60)
+        int hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.hunger);
+        if (hunger > 60)
         {
             moveSpeed = 5f;
         }
-        else if (PlayerPrefs.GetInt("hunger", 100) > 30)
+        else if (hunger > 30)
         {
             moveSpeed = 4f;
         }

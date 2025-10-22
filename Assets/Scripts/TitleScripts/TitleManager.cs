@@ -24,7 +24,7 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private TMP_InputField userNameInput;
     
     [Header("シーン設定")]
-    [SerializeField] private string gameSceneName = "GameScene";
+    [SerializeField] private string gameSceneName = "MainGameScene";
     
     void Start()
     {

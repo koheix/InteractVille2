@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    // MainGameSceneがロードされたときに読み込まれる
     private void Start()
     {
+        //プレイヤーのゲームデータをロードしておく?
+
         HandlePlayerSpawn();
     }
 

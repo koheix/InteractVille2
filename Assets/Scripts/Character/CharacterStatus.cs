@@ -29,24 +29,26 @@ public class CharacterStatus : MonoBehaviour
 
     void Start()
     {
-        // for test
-        PlayerPrefs.SetInt("hunger", 100);
 
-        appleCount = PlayerPrefs.GetInt("appleCount", 0);
+        // appleCount = PlayerPrefs.GetInt("appleCount", 0);
+        appleCount = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.appleCount);
 
         cc = GetComponent<CharacterController>();
-        //体力のロード
-        if (PlayerPrefs.HasKey("hunger"))
-        {
-            // キーが存在する場合の処理
-            hunger = PlayerPrefs.GetInt("hunger");
-        }
-        else
-        {
-            // キーが存在しない場合の処理（初回起動など）
-            PlayerPrefs.SetInt("hunger", 100);
-            hunger = 100;
-        }
+        // //体力のロード
+        // 前のバージョン
+        // if (PlayerPrefs.HasKey("hunger"))
+        // {
+        //     // キーが存在する場合の処理
+        //     hunger = PlayerPrefs.GetInt("hunger");
+        // }
+        // else
+        // {
+        //     // キーが存在しない場合の処理（初回起動など）
+        //     PlayerPrefs.SetInt("hunger", 100);
+        //     hunger = 100;
+        // }
+        hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.hunger);
+        Debug.Log("hungerrrr" + hunger);
 
         //最初の歩行距離
         previousWalkDistance = cc.GetTotalWalkDistance();
@@ -55,7 +57,7 @@ public class CharacterStatus : MonoBehaviour
     void Update()
     {
         Debug.Log(hunger);
-        Debug.Log("playerpref hunger: " + PlayerPrefs.GetInt("hunger"));
+        Debug.Log("playerpref hunger: " + SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.hunger));
         
         //移動距離の取得
         float currentWalkDistance = cc.GetTotalWalkDistance();
@@ -65,7 +67,8 @@ public class CharacterStatus : MonoBehaviour
         {
             //体力を減らす
             hunger = Mathf.Clamp(--hunger, 0, 100);
-            PlayerPrefs.SetInt("hunger", hunger);
+            // PlayerPrefs.SetInt("hunger", hunger);
+            SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.hunger = hunger);
             cc.ResetWalkDistance();
             // statusのUIに反映
             UpdateHungerUI();
@@ -88,7 +91,8 @@ public class CharacterStatus : MonoBehaviour
                 {
                     // hungerの反映
                     hunger = Mathf.Clamp(hunger + hungerRecoveryAmount, 0, 100);
-                    PlayerPrefs.SetInt("hunger", hunger);
+                    // PlayerPrefs.SetInt("hunger", hunger);
+                    SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.hunger = hunger);
                     UpdateHungerUI();
 
                     // タイマーをリセット
@@ -106,7 +110,9 @@ public class CharacterStatus : MonoBehaviour
         previousWalkDistance = currentWalkDistance;
 
         //リンゴの数をUIに反映
-        appleCount = PlayerPrefs.GetInt("appleCount", 0);
+        // appleCount = PlayerPrefs.GetInt("appleCount", 0);
+        appleCount = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.appleCount);
+        
         appleCountUI.text = appleCount.ToString();
     }
 

@@ -75,7 +75,8 @@ public class CollectibleItem : MonoBehaviour
         try
         {
             //ゲットしたリンゴを増やす処理
-            PlayerPrefs.SetInt("appleCount", PlayerPrefs.GetInt("appleCount") + 1);   
+            // PlayerPrefs.SetInt("appleCount", PlayerPrefs.GetInt("appleCount") + 1);   
+            SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = data.appleCount + 1);
         }
         catch (System.Exception)
         {
