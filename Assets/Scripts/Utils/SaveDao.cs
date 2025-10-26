@@ -18,7 +18,6 @@ public class SaveDao
     public static void SaveStructData(string userName, PlayerData data)
     {
         string SavePath = Application.persistentDataPath + "/" + userName + ".json";
-        Debug.Log(SavePath);
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, json);
     }

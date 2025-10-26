@@ -1,45 +1,140 @@
-using UnityEngine;
-using UnityEngine.Networking;
+using System;
 using System.Collections;
 using System.Text;
+using UnityEngine;
+using UnityEngine.Networking;
 
-public class LLMBridge
+public class LLMBridge : MonoBehaviour
 {
-	IEnumerator GetGPTResponse(string message)
-	{
-		string url = "YOUR_URL"; //Azure Open AIのエンドポイントURL
-		string privateApiKey = "YOUR_API_KEY"; //Azure Open AIのAPIキー
+    private const string CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+    private const string CLAUDE_VERSION = "2023-06-01";
+    
+    // レスポンスのJSONデータ構造
+    [System.Serializable]
+    private class ClaudeRequest
+    {
+        public string model = "claude-sonnet-4-20250514";
+        public int max_tokens = 1024;
+        public Message[] messages;
+    }
+    
+    [System.Serializable]
+    private class Message
+    {
+        public string role;
+        public string content;
+    }
+    
+    [System.Serializable]
+    private class ClaudeResponse
+    {
+        public string id;
+        public string type;
+        public string role;
+        public Content[] content;
+        public string model;
+        public string stop_reason;
+    }
+    
+    [System.Serializable]
+    private class Content
+    {
+        public string type;
+        public string text;
+    }
+    
+    /// <summary>
+    /// Claude APIからレスポンスを取得する
+    /// </summary>
+    /// <param name="message">送信するメッセージ</param>
+    /// <param name="APIKey">Claude APIキー</param>
+    /// <returns>Claude APIからのレスポンステキスト</returns>
+    public IEnumerator GetLLMResponse(string message, string context = "")
+    {
+        // リクエストボディの作成
+        ClaudeRequest requestData = new ClaudeRequest
+        {
+            messages = new Message[]
+            {
+                new Message
+                {
+                    role = "user",
+                    content = message
+                }
+            }
+        };
+        
+        string jsonData = JsonUtility.ToJson(requestData);
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        
+        // UnityWebRequestの作成
+        using (UnityWebRequest request = new UnityWebRequest(CLAUDE_API_URL, "POST"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            
+            // ヘッダーの設定
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("x-api-key", PlayerPrefs.GetString("APIKey"));
+            request.SetRequestHeader("anthropic-version", CLAUDE_VERSION);
+            
+            // リクエスト送信
+            yield return request.SendWebRequest();
+            
+            // エラーハンドリング
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Claude API Error: {request.error}");
+                Debug.LogError($"Response Code: {request.responseCode}");
+                Debug.LogError($"Response: {request.downloadHandler.text}");
+                yield return $"Error: {request.error}";
+                yield break;
+            }
+            
+            // レスポンスのパース
+            string responseText = request.downloadHandler.text;
+            ClaudeResponse response = null;
+            
+            try
+            {
+                response = JsonUtility.FromJson<ClaudeResponse>(responseText);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to parse Claude API response: {e.Message}");
+                Debug.LogError($"Raw response: {responseText}");
+                // yield return $"Parse Error: {e.Message}";
+                // yield break;
+            }
+            
+            // パース成功後の処理
+            if (response.content != null && response.content.Length > 0)
+            {
+                yield return response.content[0].text;
+            }
+            else
+            {
+                Debug.LogWarning("Claude API returned empty content");
+                yield return "No response content";
+            }
+        }
+    }
 
-		// ChatBody chatBody = new ChatBody
-		// {
-		// 	model = gptSettings.model, messages = message, max_tokens = gptSettings.max_tokens,
-		// 	temperature = gptSettings.temperature, top_p = gptSettings.top_p, frequency_penalty = gptSettings.frequency_penalty,
-		// 	presence_penalty = gptSettings.presences_penalty
-		// };
-		yield return "tmp";
-	}
+	// テスト
+	private void Start()
+    {
+        // StartCoroutine(ExampleUsage());
+    }
+    
+    private IEnumerator ExampleUsage()
+    {
+        Debug.Log("Sending request to Claude API...");
+        
+        IEnumerator responseCoroutine = GetLLMResponse("元気ですか？");
+        yield return StartCoroutine(responseCoroutine);
+        
+        // レスポンスの取得
+        string response = responseCoroutine.Current as string;
+        Debug.Log($"Claude Response: {response}");
+    }
 }
-
-// [Serializable]
-// public class GPTSettings
-// {
-// 	public string model = "gpt-4";
-//     //生成するトークンの最大数
-// 	public int max_tokens = 2048;
-//     //ランダム性をコントロールするパラメータ tempratureがゼロに近づくにつれてモデルは決定論的で繰り返しの多いものになる
-// 	[Range(0.0f, 1.0f)]
-// 	public float temperature = 0.2f;
-//     //多様性をnucleusサンプリングを介して制御 
-// 	[Range(0.0f, 1.0f)]
-// 	public float top_p = 0.8f;
-//     //APIがさらにトークンを生成しないようにする場所
-// 	public string stop;
-//     //新しいトークンを、これまでのテキストでの既存の頻度に基づいてどれだけペナルティを科すかを制御
-//     //これにより、モデルが同じ行を言い換える可能性が低くなる
-// 	[Range(0.0f, 2.0f)]
-// 	public float frequency_penalty = 0;
-//     //新しいトークンを、これまでのテキストでの出現に基づいてどれだけペナルティを科すかを制御
-//     //これにより、モデルが新しいトピックについて話す可能性が高くなる
-// 	[Range(0.0f, 2.0f),]
-// 	public float presences_penalty = 0;
-// }

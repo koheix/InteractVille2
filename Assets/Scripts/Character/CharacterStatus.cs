@@ -48,7 +48,6 @@ public class CharacterStatus : MonoBehaviour
         //     hunger = 100;
         // }
         hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.hunger);
-        Debug.Log("hungerrrr" + hunger);
 
         //最初の歩行距離
         previousWalkDistance = cc.GetTotalWalkDistance();
@@ -56,8 +55,6 @@ public class CharacterStatus : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(hunger);
-        Debug.Log("playerpref hunger: " + SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.hunger));
         
         //移動距離の取得
         float currentWalkDistance = cc.GetTotalWalkDistance();
@@ -84,8 +81,6 @@ public class CharacterStatus : MonoBehaviour
                 // タイマー加算
                 idleTimer += Time.deltaTime;
 
-                Debug.Log("ifに入ってる");
-                Debug.Log(idleTimer);
                 // 1秒ごとにhungerを回復
                 if(idleTimer >= hungerRecoveryInterval)
                 {
