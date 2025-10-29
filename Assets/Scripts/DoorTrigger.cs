@@ -78,7 +78,7 @@ public class DoorTrigger : MonoBehaviour
 
     private void ChangeScene()
     {
-        //非同期処理のほうがいいみたいだけど無理
+        //のちに非同期処理
         //UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
 
         SceneManager.LoadScene(nextSceneName);

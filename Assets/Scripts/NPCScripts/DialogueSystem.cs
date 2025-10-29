@@ -58,7 +58,7 @@ public class DialogueSystem : MonoBehaviour
         }
     }
     
-    public void StartDialogue()
+    public virtual void StartDialogue()
     {
         if (dialogueLines.Length == 0) return;
         
