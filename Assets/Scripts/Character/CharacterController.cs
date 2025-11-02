@@ -9,6 +9,11 @@ characterの動きを制御するためのコード
 */
 public class CharacterController : MonoBehaviour
 {
+    // 常にデフォルトの場所でスポーンするためのオプション
+    [Header("テスト用")]
+    [SerializeField] private bool SetPlayerPosition = false;   
+    [SerializeField] private Vector2 PlayerPosition = new Vector2(4f, 1.3f);
+
     [Header("player speed")]
     [SerializeField] private float moveSpeed = 5f;
     private Animator animator;
@@ -25,6 +30,20 @@ public class CharacterController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();  // Rigidbody2D を取得
         rb.gravityScale = 0;  // 重力を無効化
         rb.freezeRotation = true;  // 回転を固定
+
+        // データから最後の位置を読み込んで設定
+        Vector2 savedPosition = new Vector2();
+        savedPosition.x = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[0]);
+        savedPosition.y = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[1]);
+        transform.position = savedPosition;
+
+        // テスト用に特定の位置にセットするオプション
+        if (SetPlayerPosition)
+        {
+            transform.position = PlayerPosition;
+        }
+        // --------------------------------------
+
 
         // 初期位置を記録
         lastPosition = transform.position;
@@ -99,5 +118,15 @@ public class CharacterController : MonoBehaviour
     public void ResetWalkDistance()
     {
         totalWalkDistance = 0f;
+    }
+
+    void OnApplicationQuit()
+    {
+        // アプリケーション終了時に現在の位置を保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
+        {
+            data.lastPosition[0] = transform.position.x;
+            data.lastPosition[1] = transform.position.y;
+        });
     }
 }

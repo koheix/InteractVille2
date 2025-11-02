@@ -20838,6 +20838,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &669003507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 669003509}
+  - component: {fileID: 669003508}
+  m_Layer: 0
+  m_Name: ShopManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &669003508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669003507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12eb8d1ee63f7b641b9dad401a760995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shopItems:
+  - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
+  - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
+--- !u!4 &669003509
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669003507}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.7281025, y: 1.0878614, z: 0.008905584}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &727617161
 GameObject:
   m_ObjectHideFlags: 0
@@ -21684,7 +21731,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 72c859298a694ca46899482a33b7dd3c, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 0
@@ -21696,7 +21743,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: "\u6B21\u3078"
 --- !u!222 &1367732411
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -21811,6 +21858,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 694f6d9f54bcb3441b9bc0fb2f45c5be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SetPlayerPosition: 1
+  PlayerPosition: {x: 0.48, y: -2.84}
   moveSpeed: 5
 --- !u!95 &1547432350
 Animator:
@@ -22002,6 +22051,8 @@ MonoBehaviour:
   dialogueLines:
   - characterName: "\u304A\u307F\u305B\u306E\u3072\u3068"
     text: "\u3053\u3093\u306B\u3061\u306F\uFF01"
+  - characterName: "\u304A\u307F\u305B\u306E\u3072\u3068"
+    text: "\u8CB7\u3044\u7269\u3067\u3059\u304B\uFF1F"
   typeSpeed: 0.05
 --- !u!1 &1746343777
 GameObject:
@@ -26241,3 +26292,4 @@ SceneRoots:
   - {fileID: 1547432352}
   - {fileID: 1012087025}
   - {fileID: 1285557459}
+  - {fileID: 669003509}
