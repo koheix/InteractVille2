@@ -1,3 +1,9 @@
+/*
+    DialogueSystem.cs
+    会話のUIとロジックを管理する基本的なダイアログシステム
+    他のNPC固有のダイアログシステムはこのクラスを継承して実装
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -93,21 +99,22 @@ public class DialogueSystem : MonoBehaviour
             EndDialogue();
         }
     }
-    
+
     IEnumerator TypeText(string text)
     {
         isTyping = true;
         dialogueText.text = "";
-        
+
         foreach (char letter in text.ToCharArray())
         {
             dialogueText.text += letter;
             yield return new WaitForSeconds(typeSpeed);
         }
-        
+
         isTyping = false;
     }
-    
+
+    // ボタンが押されたとき次の行へ進むメソッド
     public void NextLine()
     {
         // タイピング中の場合は即座に全文表示
@@ -121,18 +128,19 @@ public class DialogueSystem : MonoBehaviour
             isTyping = false;
             return;
         }
-        
+
         currentLineIndex++;
         DisplayLine();
     }
     
+    // 会話を終了し、UIを非表示にするメソッド
     void EndDialogue()
     {
         isDialogueActive = false;
         dialogueBox.SetActive(false);
         currentLineIndex = 0;
     }
-    
+
     // 外部からダイアログを終了させるメソッド
     public void ForceEndDialogue()
     {
@@ -141,5 +149,12 @@ public class DialogueSystem : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
         EndDialogue();
+    }
+    
+    // ダイアログラインを外部から設定するメソッド
+    // FSMで管理する場合などに使用
+    public void SetDialogueLines(DialogueLine[] newLines)
+    {
+        dialogueLines = newLines;
     }
 }

@@ -1,7 +1,11 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopperDialogueSystem : DialogueSystem
 {
+    [Header("Shopper UI References")]
+    public Button yesButton;
+    public Button noButton;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     // override void Start()
     // {
@@ -18,5 +22,5 @@ public class ShopperDialogueSystem : DialogueSystem
     {
         base.StartDialogue();
         // ここにShopperDialogueSystem固有の処理を追加
-    }   
+    }
 }
