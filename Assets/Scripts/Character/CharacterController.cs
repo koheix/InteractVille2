@@ -129,4 +129,15 @@ public class CharacterController : MonoBehaviour
             data.lastPosition[1] = transform.position.y;
         });
     }
+
+    // シーン切り替え時にプレイヤーの位置を記録
+    void onDisable()
+    {
+        // アプリケーション終了時にプレイヤーの位置を保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
+        {
+            data.lastPosition[0] = transform.position.x;
+            data.lastPosition[1] = transform.position.y;
+        });
+    }
 }
