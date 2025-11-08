@@ -20,7 +20,7 @@ public class DialogueTrigger : MonoBehaviour
     void Update()
     {
         // プレイヤーが範囲内にいる時のみspaceキーでダイアログ開始
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.Space))
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.Space) && !dialogueSystem.IsDialogueActive)
         {
             if (dialogueSystem != null)
             {

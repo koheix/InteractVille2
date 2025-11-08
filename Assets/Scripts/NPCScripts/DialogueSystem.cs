@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// ダイアログの1行分のデータ構造
 [System.Serializable]
 public class DialogueLine
 {
@@ -25,19 +26,23 @@ public class DialogueSystem : MonoBehaviour
     public TextMeshProUGUI characterNameText;
     public TextMeshProUGUI dialogueText;
     public Button nextButton;
-    
+
     [Header("Dialogue Data")]
-    public DialogueLine[] dialogueLines;
+    // public DialogueLine[] dialogueLines;
+    [SerializeField]
+    protected DialogueLine[] dialogueLines;
     
-    private int currentLineIndex = 0;
-    private bool isDialogueActive = false;
-    private bool isTyping = false;
-    private Coroutine typingCoroutine;
+    protected int currentLineIndex = 0;
+    protected bool isDialogueActive = false;
+    // getter for isDialogueActive
+    public bool IsDialogueActive { get { return isDialogueActive; } }
+    protected bool isTyping = false;
+    protected Coroutine typingCoroutine;
     
     [Header("Typing Animation")]
     public float typeSpeed = 0.05f;
     
-    void Start()
+    protected virtual void Start()
     {
         // 初期状態でダイアログボックスを非表示
         dialogueBox.SetActive(false);
@@ -46,21 +51,6 @@ public class DialogueSystem : MonoBehaviour
         if (nextButton != null)
         {
             nextButton.onClick.AddListener(NextLine);
-        }
-    }
-    
-    void Update()
-    {
-        // ダイアログが表示されている時のみ入力を受け付ける
-        if (isDialogueActive)
-        {
-            // スペースキー、エンターキー、マウスクリックで次の行へ
-            if (Input.GetKeyDown(KeyCode.Space) || 
-                Input.GetKeyDown(KeyCode.Return) || 
-                Input.GetMouseButtonDown(0))
-            {
-                NextLine();
-            }
         }
     }
     
@@ -75,7 +65,7 @@ public class DialogueSystem : MonoBehaviour
         DisplayLine();
     }
     
-    void DisplayLine()
+    protected void DisplayLine()
     {
         if (currentLineIndex < dialogueLines.Length)
         {
@@ -115,8 +105,9 @@ public class DialogueSystem : MonoBehaviour
     }
 
     // ボタンが押されたとき次の行へ進むメソッド
-    public void NextLine()
+    void NextLine()
     {
+        Debug.Log("NextLine called");
         // タイピング中の場合は即座に全文表示
         if (isTyping)
         {
@@ -134,7 +125,7 @@ public class DialogueSystem : MonoBehaviour
     }
     
     // 会話を終了し、UIを非表示にするメソッド
-    void EndDialogue()
+    protected void EndDialogue()
     {
         isDialogueActive = false;
         dialogueBox.SetActive(false);
@@ -149,12 +140,5 @@ public class DialogueSystem : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
         EndDialogue();
-    }
-    
-    // ダイアログラインを外部から設定するメソッド
-    // FSMで管理する場合などに使用
-    public void SetDialogueLines(DialogueLine[] newLines)
-    {
-        dialogueLines = newLines;
     }
 }

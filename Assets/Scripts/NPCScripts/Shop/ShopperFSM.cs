@@ -14,75 +14,68 @@ public enum ShopState
     End         // 終了
 }
 
-public class ShopNPC : MonoBehaviour
+public class ShopperFSM
 {
     // 現在の状態を保持
+    // getterのみ公開
     private ShopState currentState = ShopState.Idle;
-
-    [Header("DialogueSystem Reference")]
-    public DialogueSystem dialogueSystem;
-
-    void Start()
-    {
-        // 待機状態から始める
-        currentState = ShopState.Idle;
-    }
-
-    void Update()
-    {
-        // // 簡易的にスペースキーで会話開始
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     if (currentState == ShopState.Idle)
-        //     {
-        //         EnterState(ShopState.Greeting);
-        //     }
-        // }
-    }
+    public ShopState CurrentState { get { return currentState; } }
 
     // 現在の状態とyes, noボタンの選択に基づいて状態を変更
     // ボタンを押すときに呼び出す
-    void changeState(bool isYes)
+    public DialogueLine[] changeState(bool isYes)
     {
         if(currentState == ShopState.Idle)
         {
-            EnterState(ShopState.Greeting);
+            return EnterState(ShopState.Greeting);
         }
         else if (currentState == ShopState.Greeting)
         {
             if (isYes)
             {
-                EnterState(ShopState.BuyMenu);
+                return EnterState(ShopState.BuyMenu);
             }
             else
             {
-                EnterState(ShopState.End);
+                return EnterState(ShopState.End);
             }
         }
         else if (currentState == ShopState.BuyMenu)
         {
-            EnterState(ShopState.End);
+            return EnterState(ShopState.End);
         }
-        else if (currentState == ShopState.End)
+        else // currentState == ShopState.End
         {
-            EnterState(ShopState.Idle);
+            return EnterState(ShopState.Idle);
         }
     }
 
-    void EnterState(ShopState newState)
+    DialogueLine[] EnterState(ShopState newState)
     {
         currentState = newState;
         switch (newState)
         {
             case ShopState.Greeting:
-                Debug.Log("NPC：いらっしゃい！今日は何をお探し？");
-                ShowMainMenu();
-                break;
+                Debug.Log("NPC：いらっしゃい！今日はお買い物ですか？");
+                DialogueLine[] lines = new DialogueLine[1];
+                lines[0] = new DialogueLine
+                {
+                    characterName = "おみせのひと",
+                    text = "いらっしゃい！今日はお買い物ですか？"
+                };
+                // ShowMainMenu(); ここはdialoguesystemでやる
+                return lines;
 
             case ShopState.BuyMenu:
-                Debug.Log("NPC：こちらが商品一覧です🛒");
-                // 商品リスト表示処理を書く
-                break;
+                Debug.Log("NPC：こちらが商品一覧です");
+                DialogueLine[] buyLines = new DialogueLine[1];
+                buyLines[0] = new DialogueLine
+                {
+                    characterName = "おみせのひと",
+                    text = "こちらが商品一覧です"
+                };
+                // 商品リスト表示処理はdialoguesystemでやる
+                return buyLines;
 
             // case ShopState.SellMenu:
             //     Debug.Log("NPC：売りたいもんあるん？見せて💰");
@@ -90,10 +83,18 @@ public class ShopNPC : MonoBehaviour
             //     break;
 
             case ShopState.End:
-                Debug.Log("NPC：まいどあり〜！また来てな！");
-                currentState = ShopState.Idle;
-                break;
+                Debug.Log("NPC：また来てね！");
+                DialogueLine[] endLines = new DialogueLine[1];
+                endLines[0] = new DialogueLine
+                {
+                    characterName = "おみせのひと",
+                    text = "また来てね！"
+                };
+                // 会話終了処理はdialoguesystemでやる
+                return endLines;
         }
+        DialogueLine[] defaultLines = new DialogueLine[0];
+        return defaultLines;
     }
 
     void ShowMainMenu()
