@@ -48,6 +48,8 @@ public class CharacterStatus : MonoBehaviour
         //     hunger = 100;
         // }
         hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.hunger);
+        // シーンチェンジ後も体力を維持するため
+        UpdateHungerUI();
 
         //最初の歩行距離
         previousWalkDistance = cc.GetTotalWalkDistance();

@@ -1,14 +1,18 @@
 using UnityEngine;
 
+/**
+ * プレイヤーがNPCに近づいたときにダイアログを開始するトリガースクリプト
+ * NPCにアタッチして使用
+ */
 public class DialogueTrigger : MonoBehaviour
 {
     [Header("Dialogue Settings")]
     public DialogueSystem dialogueSystem;
-    public bool isPlayerInRange = false;
-    
+    private bool isPlayerInRange = false;
+
     [Header("UI Prompt")]
     public GameObject interactionPrompt; // "Eキーで話す"などの表示用
-    
+
     void Start()
     {
         if (interactionPrompt != null)
@@ -16,7 +20,7 @@ public class DialogueTrigger : MonoBehaviour
             interactionPrompt.SetActive(false);
         }
     }
-    
+
     void Update()
     {
         // プレイヤーが範囲内にいる時のみspaceキーでダイアログ開始
@@ -25,7 +29,7 @@ public class DialogueTrigger : MonoBehaviour
             if (dialogueSystem != null)
             {
                 dialogueSystem.StartDialogue();
-                
+
                 // プロンプトを非表示
                 if (interactionPrompt != null)
                 {
@@ -34,13 +38,13 @@ public class DialogueTrigger : MonoBehaviour
             }
         }
     }
-    
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = true;
-            
+
             // インタラクションプロンプトを表示
             if (interactionPrompt != null)
             {
@@ -48,52 +52,20 @@ public class DialogueTrigger : MonoBehaviour
             }
         }
     }
-    
+
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = false;
-            
+
             // プロンプトを非表示
             if (interactionPrompt != null)
             {
                 interactionPrompt.SetActive(false);
             }
-            
+
             // ダイアログが進行中の場合は強制終了
-            if (dialogueSystem != null)
-            {
-                dialogueSystem.ForceEndDialogue();
-            }
-        }
-    }
-    
-    // 3Dゲームの場合はOnTriggerEnter/Exitを使用
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInRange = true;
-            
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(true);
-            }
-        }
-    }
-    
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInRange = false;
-            
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(false);
-            }
-            
             if (dialogueSystem != null)
             {
                 dialogueSystem.ForceEndDialogue();

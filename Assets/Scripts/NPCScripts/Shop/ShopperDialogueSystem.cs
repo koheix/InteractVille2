@@ -10,7 +10,7 @@ public class ShopperDialogueSystem : DialogueSystem
     [Header("Shopper FSM Reference")]
     private ShopperFSM shopperFSM = new ShopperFSM();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    protected override void Start()
+    public override void Start()
     {
         base.Start();
         // Next buttonにクリックイベントを追加

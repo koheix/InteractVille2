@@ -28,7 +28,6 @@ public class DialogueSystem : MonoBehaviour
     public Button nextButton;
 
     [Header("Dialogue Data")]
-    // public DialogueLine[] dialogueLines;
     [SerializeField]
     protected DialogueLine[] dialogueLines;
     
@@ -42,7 +41,7 @@ public class DialogueSystem : MonoBehaviour
     [Header("Typing Animation")]
     public float typeSpeed = 0.05f;
     
-    protected virtual void Start()
+    public virtual void Start()
     {
         // 初期状態でダイアログボックスを非表示
         dialogueBox.SetActive(false);
@@ -50,7 +49,9 @@ public class DialogueSystem : MonoBehaviour
         // Next buttonにクリックイベントを追加
         if (nextButton != null)
         {
+            Debug.Log("Adding NextLine listener to nextButton");
             nextButton.onClick.AddListener(NextLine);
+            Debug.Log("Listener added successfully");
         }
     }
     
