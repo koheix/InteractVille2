@@ -126,7 +126,7 @@ public class DialogueSystem : MonoBehaviour
     }
     
     // 会話を終了し、UIを非表示にするメソッド
-    protected void EndDialogue()
+    protected virtual void EndDialogue()
     {
         isDialogueActive = false;
         dialogueBox.SetActive(false);
