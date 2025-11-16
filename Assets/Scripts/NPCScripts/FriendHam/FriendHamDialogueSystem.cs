@@ -83,6 +83,7 @@ public class FriendHamDialogueSystem : DialogueSystem
         base.EndDialogue();
         // pettingBox.SetActive(false);
         // presentBox.SetActive(false);
+        chattingBox.SetActive(false);
         quitButton.gameObject.SetActive(false); // やめるボタンを非表示
     }
 

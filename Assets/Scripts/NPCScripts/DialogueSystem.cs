@@ -62,6 +62,8 @@ public class DialogueSystem : MonoBehaviour
         isDialogueActive = true;
         currentLineIndex = 0;
         dialogueBox.SetActive(true);
+        // 移動入力を無効化
+        InputController.Instance.DisableMovement();
         
         DisplayLine();
     }
@@ -131,6 +133,8 @@ public class DialogueSystem : MonoBehaviour
         isDialogueActive = false;
         dialogueBox.SetActive(false);
         currentLineIndex = 0;
+        // 移動入力を有効化
+        InputController.Instance.EnableMovement();
     }
 
     // 外部からダイアログを終了させるメソッド

@@ -59,31 +59,33 @@ public class CharacterController : MonoBehaviour
 
         // Debug.Log($"総移動距離: {totalWalkDistance:F2}");
 
-        // 入力処理（Raw を使うとキビキビした動きになる）
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
-        moveInput.Normalize();  // 斜め移動を速くしすぎないように正規化
-
-        // アニメーション処理
-        if (moveInput == Vector2.zero)
+        if (InputController.Instance != null && InputController.Instance.canMove)
         {
-            animator.SetInteger("WalkDirection", 0);
-        }
-        else if (moveInput.x > 0)
-        {
-            animator.SetInteger("WalkDirection", 4);
-        }
-        else if (moveInput.x < 0)
-        {
-            animator.SetInteger("WalkDirection", 2);
-        }
-        else if (moveInput.y > 0)
-        {
-            animator.SetInteger("WalkDirection", 3);
-        }
-        else if (moveInput.y < 0)
-        {
-            animator.SetInteger("WalkDirection", 1);
+            // 入力処理（Raw を使うとキビキビした動きになる）
+            moveInput.x = Input.GetAxisRaw("Horizontal");
+            moveInput.y = Input.GetAxisRaw("Vertical");
+            moveInput.Normalize();  // 斜め移動を速くしすぎないように正規化
+            // アニメーション処理
+            if (moveInput == Vector2.zero)
+            {
+                animator.SetInteger("WalkDirection", 0);
+            }
+            else if (moveInput.x > 0)
+            {
+                animator.SetInteger("WalkDirection", 4);
+            }
+            else if (moveInput.x < 0)
+            {
+                animator.SetInteger("WalkDirection", 2);
+            }
+            else if (moveInput.y > 0)
+            {
+                animator.SetInteger("WalkDirection", 3);
+            }
+            else if (moveInput.y < 0)
+            {
+                animator.SetInteger("WalkDirection", 1);
+            }
         }
     }
 
