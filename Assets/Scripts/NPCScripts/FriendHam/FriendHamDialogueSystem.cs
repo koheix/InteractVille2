@@ -25,6 +25,10 @@ public class FriendHamDialogueSystem : DialogueSystem
     // メニューに戻るためのボタン
     public Button returnButton;
 
+    [Header("FriendHam Status Reference")]
+    public FriendHamStatus friendHamStatus;
+
+
     private FriendHamFSM friendHamFSM = new FriendHamFSM();
 
 
@@ -59,6 +63,22 @@ public class FriendHamDialogueSystem : DialogueSystem
         {
             chatButton.onClick.AddListener(OpenChattingBox);
         }
+        // chattingBoxのボタンイベントを設定
+        // 送信ボタン
+        if (sendButton != null)
+        {
+            sendButton.onClick.AddListener(OnSendButtonClicked);
+        }
+        // メニューに戻るボタン
+        if (returnButton != null)
+        {
+            returnButton.onClick.AddListener(() =>
+            {
+                chattingBox.SetActive(false);
+                dialogueBox.SetActive(true);
+            });
+        }
+
 
     }
 
@@ -104,5 +124,30 @@ public class FriendHamDialogueSystem : DialogueSystem
     //     chattingBox.SetActive(false);
     //     pettingBox.SetActive(false);
     // }
+
+    // chat送信ボタンのイベント
+    void OnSendButtonClicked()
+    {
+        string playerMessage = chatInputField.text;
+        // メッセージが空でない場合のみ処理
+        if (!string.IsNullOrEmpty(playerMessage))
+        {
+            // // ともハムの応答を生成（いったん固定応答を使用）
+            // string FriendHamResponse = "ともハム：それは面白いね！";
+            // StartCoroutine(friendHamStatus.Speak(playerMessage));
+            StartCoroutine(friendHamStatus.Speak(playerMessage, res => {
+                Debug.Log(res);
+                chattingText.text = res;
+            }));
+
+
+            // ともハムの応答を表示
+            chattingCharacterNameText.text = "ともハム";
+            // chattingText.text = res;
+
+            // 入力フィールドをクリア
+            chatInputField.text = "";
+        }
+    }
 
 }

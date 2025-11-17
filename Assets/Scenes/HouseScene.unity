@@ -20768,6 +20768,7 @@ GameObject:
   - component: {fileID: 326513786}
   - component: {fileID: 326513785}
   - component: {fileID: 326513784}
+  - component: {fileID: 326513787}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -20782,7 +20783,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 326513783}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
@@ -20836,6 +20837,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &326513787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326513783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
 --- !u!1 &342301321
 GameObject:
   m_ObjectHideFlags: 0
@@ -21245,7 +21266,10 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 7362578087771699189, guid: e6696bfed4d96fc4ab5fd7c930af86d0, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7348138203526650445, guid: e6696bfed4d96fc4ab5fd7c930af86d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1623401593}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7252309834583815670, guid: e6696bfed4d96fc4ab5fd7c930af86d0, type: 3}
       insertIndex: -1
@@ -21387,7 +21411,7 @@ MonoBehaviour:
   m_KeepTextSelectionVisible: 0
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
-  m_LineLimit: 0
+  m_LineLimit: 3
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
@@ -21762,8 +21786,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -22840,6 +22864,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953270765}
   m_CullTransparentMesh: 1
+--- !u!1 &965777162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 965777164}
+  - component: {fileID: 965777163}
+  m_Layer: 0
+  m_Name: LLMBridge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &965777163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965777162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 825b8a3ebbeaab2488a07495272eeee4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &965777164
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965777162}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 305.78113, y: 141.94832, z: 3.1143718}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &987633792
 GameObject:
   m_ObjectHideFlags: 0
@@ -23131,6 +23199,7 @@ MonoBehaviour:
   chattingCharacterNameText: {fileID: 953270767}
   chattingText: {fileID: 585073048}
   returnButton: {fileID: 706464753}
+  friendHamStatus: {fileID: 1623401594}
 --- !u!1 &1172709895
 GameObject:
   m_ObjectHideFlags: 0
@@ -23521,6 +23590,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1458381411}
   m_CullTransparentMesh: 1
+--- !u!4 &1538430094 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7348138203526650445, guid: e6696bfed4d96fc4ab5fd7c930af86d0, type: 3}
+  m_PrefabInstance: {fileID: 466847872}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1547432346
 GameObject:
   m_ObjectHideFlags: 0
@@ -23816,6 +23890,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1592405309}
   m_CullTransparentMesh: 1
+--- !u!1 &1623401592
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1623401593}
+  - component: {fileID: 1623401594}
+  m_Layer: 6
+  m_Name: FriendHamStatus
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1623401593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623401592}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1538430094}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1623401594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623401592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d178416892acad4dab37b922f8f2eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  llmBridge: {fileID: 965777163}
+  memory: []
 --- !u!1 &1697016554
 GameObject:
   m_ObjectHideFlags: 0
@@ -28489,3 +28609,4 @@ SceneRoots:
   - {fileID: 1547432352}
   - {fileID: 1012087025}
   - {fileID: 466847872}
+  - {fileID: 965777164}
