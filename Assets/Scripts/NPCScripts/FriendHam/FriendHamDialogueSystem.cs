@@ -135,10 +135,24 @@ public class FriendHamDialogueSystem : DialogueSystem
             // // ともハムの応答を生成（いったん固定応答を使用）
             // string FriendHamResponse = "ともハム：それは面白いね！";
             // StartCoroutine(friendHamStatus.Speak(playerMessage));
-            StartCoroutine(friendHamStatus.Speak(playerMessage, res => {
-                Debug.Log(res);
-                chattingText.text = res;
-            }));
+            // StartCoroutine(friendHamStatus.Speak(playerMessage,
+            //     res =>
+            //     {
+            //         Debug.Log(res);
+            //         chattingText.text = res;
+            //     }
+            // ));
+            
+            StartCoroutine(friendHamStatus.Speak(playerMessage, 
+                res => {
+                    // ストリーミング中の更新
+                    chattingText.text = res;
+                },
+                finalRes => {
+                    // 完了時の処理
+                    Debug.Log("Complete: " + finalRes);
+                }
+            ));
 
 
             // ともハムの応答を表示

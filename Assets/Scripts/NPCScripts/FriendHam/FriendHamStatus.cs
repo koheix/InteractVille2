@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 public class FriendHamStatus : MonoBehaviour
@@ -38,34 +39,132 @@ public class FriendHamStatus : MonoBehaviour
     }
 
     // memory(ともハムの記憶を保存するための文字列リスト)
-    public System.Collections.Generic.List<string> memory = new System.Collections.Generic.List<string>();
+    // ゲームが終了するときに保存する(SaveDaoを使う)
+    public List<string> memory = new List<string>();
+    private LLMBridge.ConversationHistory conversationHistory = new LLMBridge.ConversationHistory();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     // ともハムの発話メソッド
-    public IEnumerator Speak(string message, System.Action<string> callback)
+    // public IEnumerator Speak(string message, System.Action<string> callback)
+    // {
+    //     // 発話処理
+    //     // 記憶と相手の発話内容に基づいて返事をする
+    //     Debug.Log("[Friend Ham]Sending request to Claude API...");
+
+    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(message, string.Join("\n", memory));
+    //     yield return StartCoroutine(responseCoroutine);
+
+    //     // レスポンスの取得
+    //     string response = responseCoroutine.Current as string;
+    //     // Debug.Log($"Claude Response: {response}");
+    //     // string result = "APIの結果"; // 実際はレスポンスを入れる
+    //     callback?.Invoke(response);
+    // }
+    // public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)
+    // {
+    //     Debug.Log("[Friend Ham]Sending request to Claude API...");
+
+    //     string finalResponse = "";
+
+    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
+    //         message,
+    //         string.Join("\n", memory),
+    //         (partialText) =>
+    //         {
+    //             finalResponse = partialText;
+    //             onUpdate?.Invoke(partialText);  // リアルタイム更新
+    //         }
+    //     );
+
+    //     yield return StartCoroutine(responseCoroutine);
+
+    //     onComplete?.Invoke(finalResponse);  // 完了時のコールバック
+    // }
+
+    public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)
     {
-        // 発話処理
-        // 記憶と相手の発話内容に基づいて返事をする
-        Debug.Log("Sending request to Claude API...");
-        
-        IEnumerator responseCoroutine = llmBridge.GetLLMResponse(message, string.Join("\n", memory));
+        Debug.Log("[Friend Ham]Sending request to Claude API...");
+
+        // ユーザーメッセージを履歴に追加
+        conversationHistory.AddUserMessage(message);
+
+        string finalResponse = "";
+
+        IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
+            "あなたは親しみやすい友達のハムスターです。\n" +
+            "ただし、メッセージは1から3文程度の短い文章で答えてください。\n" +
+            "また、メッセージのみで、描写は含めないでください。",  // システムメッセージ
+            conversationHistory.ToArray(),  // 履歴全体を送信
+            (partialText) =>
+            {
+                finalResponse = partialText;
+                onUpdate?.Invoke(partialText);
+            }
+        );
+
         yield return StartCoroutine(responseCoroutine);
-        
-        // レスポンスの取得
-        string response = responseCoroutine.Current as string;
-        // Debug.Log($"Claude Response: {response}");
-        // string result = "APIの結果"; // 実際はレスポンスを入れる
-        callback?.Invoke(response);
+
+        // アシスタントの返答を履歴に追加
+        conversationHistory.AddAssistantMessage(finalResponse);
+
+        // // メモリにも保存
+        // memory.Add($"User: {message}");
+        // memory.Add($"Assistant: {finalResponse}");
+        DebugPrintConversation();
+
+        onComplete?.Invoke(finalResponse);
     }
+
+    // 会話履歴をクリア
+    public void ClearConversation()
+    {
+        conversationHistory.Clear();
+        // memory.Clear();
+    }
+
+    public void DebugPrintConversation()
+    {
+        Debug.Log("=== Conversation History ===");
+        foreach (var msg in conversationHistory.messages)
+        {
+            Debug.Log($"{msg.role}: {msg.content}");
+        }
+    }
+
+    // // ゲーム終了時に履歴をLLMに渡してメモリを保存する
+    // void OnApplicationQuit()
+    // {
+    //     // LLMに履歴を渡してメモリを生成する
+    //     Debug.Log("[Friend Ham]メモリを生成中...");
+
+    //     string finalResponse = "";
+
+    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
+    //         "会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
+    //         conversationHistory.ToArray(),  // 履歴全体を送信
+    //         (partialText) =>
+    //         {
+    //             finalResponse = partialText;
+    //         }
+    //         // stream: false  // ストリーミングは不要
+    //     );
+    //     StartCoroutine(responseCoroutine);
+    //     Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
+
+    //     // ここで履歴を保存する処理を追加
+    //     // 例: SaveDao.SaveMemory(memory);
+    // }
+
+
 }
