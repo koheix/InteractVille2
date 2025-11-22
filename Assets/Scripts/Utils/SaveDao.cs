@@ -15,12 +15,14 @@ public class PlayerData
     public int friendHamArousal = 50;
     public int friendHamHunger = 50;
     public List<string> friendHamMemory = new List<string>();
+
+    // 会話履歴
+    public List<Message> conversationHistory = new List<Message>();
 }
 
 
 public class SaveDao
 {
-
     public static void SaveStructData(string userName, PlayerData data)
     {
         string SavePath = Application.persistentDataPath + "/" + userName + ".json";

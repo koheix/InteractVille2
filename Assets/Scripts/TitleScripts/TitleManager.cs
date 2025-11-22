@@ -165,13 +165,14 @@ public class TitleManager : MonoBehaviour
     // 終了ボタンクリック時の処理
     private void OnExitButtonClicked()
     {
-        Debug.Log("ゲームを終了します");
+        QuitManager.Instance.RequestQuit();
+//         Debug.Log("ゲームを終了します");
 
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+// #if UNITY_EDITOR
+//         UnityEditor.EditorApplication.isPlaying = false;
+// #else
+//             Application.Quit();
+// #endif
     }
     
     // BGM音量変更時の処理

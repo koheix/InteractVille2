@@ -40,13 +40,42 @@ public class FriendHamStatus : MonoBehaviour
 
     // memory(ともハムの記憶を保存するための文字列リスト)
     // ゲームが終了するときに保存する(SaveDaoを使う)
-    public List<string> memory = new List<string>();
+    // public List<string> memory = new List<string>();
+    // memory = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory);
+    public List<string> memory;
+    private const int MaxMemorySize = 10;
     private LLMBridge.ConversationHistory conversationHistory = new LLMBridge.ConversationHistory();
 
+    //singleton化
+    // public static FriendHamStatus Instance { get; private set; }
+    // private void Awake()
+    // {
+    //     DontDestroyOnLoad(gameObject);
+    // }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        memory = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory);
+    }
+    void OnEnable()
+    {
+        Debug.Log("FriendHamStatus: Registering SaveMemory task to QuitManager");
+        QuitManager.Instance.AddReturn2TitleTask(SaveMemory());
+    }
 
+    void OnDisable()
+    {
+        // 会話履歴を保存しておく
+        Debug.Log("FriendHamStatus: 会話履歴の保存");
+        List<Message> conversationLog = new List<Message>();
+        conversationLog = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory);
+        if (conversationHistory.messages.Count > 1)
+        {
+            conversationHistory.messages.RemoveAt(conversationHistory.messages.Count - 1);
+            conversationLog.AddRange(conversationHistory.messages);
+        }
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory = conversationLog);
     }
 
     // Update is called once per frame
@@ -104,7 +133,10 @@ public class FriendHamStatus : MonoBehaviour
         IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
             "あなたは親しみやすい友達のハムスターです。\n" +
             "ただし、メッセージは1から3文程度の短い文章で答えてください。\n" +
-            "また、メッセージのみで、描写は含めないでください。",  // システムメッセージ
+            "また、メッセージのみで、描写は含めないでください。\n" + 
+            "以下はこのユーザーとの会話でのあなたの記憶です。" + 
+            string.Join("\n", memory) +
+            "この情報を元に、以下のユーザーメッセージに返答してください。",  // システムメッセージ
             conversationHistory.ToArray(),  // 履歴全体を送信
             (partialText) =>
             {
@@ -142,29 +174,45 @@ public class FriendHamStatus : MonoBehaviour
         }
     }
 
-    // // ゲーム終了時に履歴をLLMに渡してメモリを保存する
-    // void OnApplicationQuit()
-    // {
-    //     // LLMに履歴を渡してメモリを生成する
-    //     Debug.Log("[Friend Ham]メモリを生成中...");
+    // ゲーム終了時に履歴をLLMに渡してメモリを保存する
+    public IEnumerator SaveMemory()
+    {
+        // LLMに履歴を渡してメモリを生成する
+        Debug.Log("[Friend Ham]メモリを生成中...");
 
-    //     string finalResponse = "";
+        string finalResponse = "";
+        
+        // 要約支持を履歴に追加
+        string message = "これまでの会話履歴から、あなたとの重要な思い出や情報を3つ程度要約してメモリとして保存してください。" +
+                         "それぞれは短い文章で表現してください。" +
+                         "また、箇条書き形式で、その内容だけを出力してください。";
+        conversationHistory.AddUserMessage(message);
 
-    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
-    //         "会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
-    //         conversationHistory.ToArray(),  // 履歴全体を送信
-    //         (partialText) =>
-    //         {
-    //             finalResponse = partialText;
-    //         }
-    //         // stream: false  // ストリーミングは不要
-    //     );
-    //     StartCoroutine(responseCoroutine);
-    //     Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
+        IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
+            "会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
+            conversationHistory.ToArray(),  // 履歴全体を送信
+            (partialText) =>
+            {
+                finalResponse = partialText;
+            }
+            // stream: false  // ストリーミングは不要
+        );
+        // StartCoroutine(responseCoroutine);
+        yield return StartCoroutine(responseCoroutine);
+        Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
+        // memoryに保存
+        memory.Add(finalResponse);
+        // 10個を超えたら古いものから削除
+        if (memory.Count > MaxMemorySize)
+        {
+            memory.RemoveAt(0);
+        }
 
-    //     // ここで履歴を保存する処理を追加
-    //     // 例: SaveDao.SaveMemory(memory);
-    // }
+
+        // ここで履歴を保存する処理を追加
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory = memory);
+    }
 
 
 }

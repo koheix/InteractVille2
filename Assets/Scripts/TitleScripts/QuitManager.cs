@@ -1,0 +1,100 @@
+/* QuitManager.cs
+ * ゲーム終了時に実行する処理を管理するマネージャークラス
+ * セーブ処理やリソース解放など、終了前に行いたい処理を登録する
+ * 友ハムのメモリーを保存したりする
+ */
+
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+
+public class QuitManager : MonoBehaviour
+{
+    public static QuitManager Instance { get; private set; }
+
+    private bool quitting = false;
+    private bool return2title = false;
+
+    // 終了時に実行する処理をリストで管理
+    private List<IEnumerator> quitTasks = new List<IEnumerator>();
+    private List<IEnumerator> return2TitleTasks = new List<IEnumerator>();
+
+    private void Awake()
+    {
+        // Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    // 終了処理を追加する
+    public void AddQuitTask(IEnumerator task)
+    {
+        quitTasks.Add(task);
+    }
+
+    // 終了ボタンから呼ぶメソッド
+    public void RequestQuit()
+    {
+        if (quitting) return;
+
+        quitting = true;
+        StartCoroutine(QuitFlow());
+    }
+
+    // タイトルへ戻る際の処理を追加する
+    public void AddReturn2TitleTask(IEnumerator task)
+    {
+        return2TitleTasks.Add(task);
+    }
+
+    // タイトルへ戻るボタンから呼ぶメソッド
+    public void RequestReturn2Title()
+    {
+        if (return2title) return;
+
+        return2title = true;
+        StartCoroutine(Return2TitleFlow());
+    }
+
+    // 終了処理
+    private IEnumerator QuitFlow()
+    {
+        Debug.Log("終了処理開始…");
+
+        // 登録されてるタスクを順番に全部実行して待つ
+        foreach (var task in quitTasks)
+            yield return StartCoroutine(task);
+
+        Debug.Log("終了処理完了");
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+    }
+
+    // タイトルへ戻る処理
+    private IEnumerator Return2TitleFlow()
+    {
+        Debug.Log("タイトルへ戻る処理開始…");
+
+        // 登録されてるタスクを順番に全部実行して待つ
+        foreach (var task in return2TitleTasks)
+            yield return StartCoroutine(task);
+
+        return2TitleTasks.Clear();
+        Debug.Log("タイトルへ戻る処理完了");
+        SceneManager.LoadScene("TitleScene", LoadSceneMode.Single);
+    }
+}
