@@ -14,6 +14,7 @@ public class PlayerData
     public int friendHamValence = 50;
     public int friendHamArousal = 50;
     public int friendHamHunger = 50;
+    public int friendHamCloseness = 50;
     public List<string> friendHamMemory = new List<string>();
 
     // 会話履歴

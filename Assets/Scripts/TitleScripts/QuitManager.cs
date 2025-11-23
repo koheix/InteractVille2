@@ -101,13 +101,36 @@ public class QuitManager : MonoBehaviour
     }
 
     // タイトルへ戻る処理
+    // private IEnumerator Return2TitleFlow()
+    // {
+    //     Debug.Log("タイトルへ戻る処理開始…");
+
+    //     // 登録されてるタスクを順番に全部実行して待つ
+    //     foreach (var task in return2TitleTasks)
+    //         yield return StartCoroutine(task);
+
+    //     return2TitleTasks.Clear();
+    //     Debug.Log("タイトルへ戻る処理完了");
+    //     SceneManager.LoadScene("TitleScene", LoadSceneMode.Single);
+    // }
+
+    // 同時実行版タイトルへ戻る処理
     private IEnumerator Return2TitleFlow()
     {
         Debug.Log("タイトルへ戻る処理開始…");
 
-        // 登録されてるタスクを順番に全部実行して待つ
+        // すべてのタスクを同時に開始
+        List<Coroutine> runningCoroutines = new List<Coroutine>();
         foreach (var task in return2TitleTasks)
-            yield return StartCoroutine(task);
+        {
+            runningCoroutines.Add(StartCoroutine(task));
+        }
+
+        // すべてのタスクの完了を待つ
+        foreach (var coroutine in runningCoroutines)
+        {
+            yield return coroutine;
+        }
 
         return2TitleTasks.Clear();
         Debug.Log("タイトルへ戻る処理完了");

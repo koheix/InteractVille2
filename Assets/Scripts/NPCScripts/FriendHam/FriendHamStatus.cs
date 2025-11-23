@@ -37,6 +37,12 @@ public class FriendHamStatus : MonoBehaviour
         get { return hunger; }
         set { hunger = Mathf.Clamp(value, 0, 100); }
     }
+    private int closeness = 50;
+    public int Closeness
+    {
+        get { return closeness; }
+        set { closeness = Mathf.Clamp(value, 0, 100); }
+    }
 
     // memory(ともハムの記憶を保存するための文字列リスト)
     // ゲームが終了するときに保存する(SaveDaoを使う)
@@ -57,11 +63,20 @@ public class FriendHamStatus : MonoBehaviour
     void Start()
     {
         memory = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory);
+        valence = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamValence);
+        arousal = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamArousal);
+        hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamHunger);
+        closeness = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness);
+
+        // Debug.Log($"FriendHamStatus: Loaded memory count = {memory.Count}, Valence={Valence}, Arousal={Arousal}, Hunger={Hunger}");
     }
     void OnEnable()
     {
         Debug.Log("FriendHamStatus: Registering SaveMemory task to QuitManager");
         QuitManager.Instance.AddReturn2TitleTask(SaveMemory());
+        QuitManager.Instance.AddReturn2TitleTask(SaveValence());
+        QuitManager.Instance.AddReturn2TitleTask(SaveArousal());
+        QuitManager.Instance.AddReturn2TitleTask(SaveCloseness());
     }
 
     void OnDisable()
@@ -208,29 +223,85 @@ public class FriendHamStatus : MonoBehaviour
             memory.RemoveAt(0);
         }
 
-        // 友ハムの各種ステータスも更新して保存する
-        Debug.Log("[Friend Ham]ステータスを更新中...");
-        // ValenceとArousalをLLMに計算させる
-        yield return StartCoroutine(
-        llmBridge.GetLLMStructuredOutputResponse(
-            name: "return_calculation",
-            description: "Returns the result of a calculation",
-            "以下の記憶データから、ハムスターのValenceを算出してください。(0~100の範囲で数値を返してください）\n" +
-            "記憶データ:" +
-            // "• こうへいくんという名前のユーザーで、親しみやすい関係性を築いている\n• 家族でアウトレットに出かけ、紺色のニットのトップスを購入した\n• 新しい服の購入を喜んでおり、ファッションに関心がある様子" +
-            // "• こうへいくんとの楽しい会話の時間を共有し、お互いに幸せな気持ちになれる関係性を築いている\n• こうへいくんは「たのしいね」という素直で前向きな表現をする人柄である\n• 私たちの会話は温かく親しみやすい雰囲気で進行している" +
-            // "申し訳ないのですが、今回が私たちの最初の会話です。\n\nこれまでの会話履歴は：\n1. あなたが「はなせる？」と質問\n2. 私が「話せるよ！こうへいくん、元気だった？」と返答\n\nまだ会話が始まったばかりで、要約できる重要な思い出や情報は蓄積されていません。もう少し会話を続けてから、改めて要約をお願いしていただけますか？" +
-            // "• ユーザーは「こうへいくん」という名前で呼ばれることを好む\n• 日常的な挨拶として「こんにちは」を使用する\n• カジュアルで親しみやすいコミュニケーションスタイルを好む",
-            string.Join("\n", memory),
-            onComplete: result => valence = (int)result,
-            onError: error => Debug.LogError(error)
-        ));
-        Debug.Log($"[Friend Ham]ステータス更新完了: Valence={Valence}, Arousal={Arousal}");
-
         // ここで履歴を保存する処理を追加
         // SaveDaoを使って保存
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory = memory);
     }
 
+    // ゲーム終了時にValenceを保存する
+    public IEnumerator SaveValence()
+    {
+        // 友ハムの各種ステータスも更新して保存する
+        Debug.Log("[Friend Ham]Valenceステータスを更新中...");
+        // ValenceをLLMに計算させる
+        yield return StartCoroutine(
+        llmBridge.GetLLMStructuredOutputResponse(
+            name: "return_calculation",
+            description: "Returns the result of a calculation",
+            "以下の会話データから、ハムスターのValenceを算出してください。(0~100の範囲で数値を返してください）\n" +
+            "会話データ:" +
+            // "• こうへいくんという名前のユーザーで、親しみやすい関係性を築いている\n• 家族でアウトレットに出かけ、紺色のニットのトップスを購入した\n• 新しい服の購入を喜んでおり、ファッションに関心がある様子" +
+            // "• こうへいくんとの楽しい会話の時間を共有し、お互いに幸せな気持ちになれる関係性を築いている\n• こうへいくんは「たのしいね」という素直で前向きな表現をする人柄である\n• 私たちの会話は温かく親しみやすい雰囲気で進行している" +
+            // "申し訳ないのですが、今回が私たちの最初の会話です。\n\nこれまでの会話履歴は：\n1. あなたが「はなせる？」と質問\n2. 私が「話せるよ！こうへいくん、元気だった？」と返答\n\nまだ会話が始まったばかりで、要約できる重要な思い出や情報は蓄積されていません。もう少し会話を続けてから、改めて要約をお願いしていただけますか？" +
+            // "• ユーザーは「こうへいくん」という名前で呼ばれることを好む\n• 日常的な挨拶として「こんにちは」を使用する\n• カジュアルで親しみやすいコミュニケーションスタイルを好む",
+            conversationHistory.MessagesToString() +
+            "\n会話前のValence:" + Valence.ToString(),
+            onComplete: result => Valence = Mathf.Clamp((int)result, 0, 100),
+            onError: error => Debug.LogError(error)
+        ));
+        Debug.Log($"[Friend Ham]ステータス更新完了: Valence={Valence}");
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamValence = Valence);
+    }
 
+    // ゲーム終了時にArousalを保存する
+    public IEnumerator SaveArousal()
+    {
+        // 友ハムの各種ステータスも更新して保存する
+        Debug.Log("[Friend Ham]Arousalステータスを更新中...");
+        // ArousalをLLMに計算させる
+        yield return StartCoroutine(
+        llmBridge.GetLLMStructuredOutputResponse(
+            name: "return_calculation",
+            description: "Returns the result of a calculation",
+            "以下の会話データから、ハムスターのArousalを算出してください。(0~100の範囲で数値を返してください）\n" +
+            "会話データ:" +
+            // "• こうへいくんという名前のユーザーで、親しみやすい関係性を築いている\n• 家族でアウトレットに出かけ、紺色のニットのトップスを購入した\n• 新しい服の購入を喜んでおり、ファッションに関心がある様子" +
+            // "• こうへいくんとの楽しい会話の時間を共有し、お互いに幸せな気持ちになれる関係性を築いている\n• こうへいくんは「たのしいね」という素直で前向きな表現をする人柄である\n• 私たちの会話は温かく親しみやすい雰囲気で進行している" +
+            // "申し訳ないのですが、今回が私たちの最初の会話です。\n\nこれまでの会話履歴は：\n1. あなたが「はなせる？」と質問\n2. 私が「話せるよ！こうへいくん、元気だった？」と返答\n\nまだ会話が始まったばかりで、要約できる重要な思い出や情報は蓄積されていません。もう少し会話を続けてから、改めて要約をお願いしていただけますか？" +
+            // "• ユーザーは「こうへいくん」という名前で呼ばれることを好む\n• 日常的な挨拶として「こんにちは」を使用する\n• カジュアルで親しみやすいコミュニケーションスタイルを好む",
+            conversationHistory.MessagesToString() +
+            "\n会話前のArousal:" + Arousal.ToString(),
+            onComplete: result => Arousal = Mathf.Clamp((int)result, 0, 100),
+            onError: error => Debug.LogError(error)
+        ));
+        Debug.Log($"[Friend Ham]ステータス更新完了: Arousal={Arousal}");
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamArousal = Arousal);
+    }
+    // ゲーム終了時にClosenessを保存する
+    public IEnumerator SaveCloseness()
+    {
+        // 友ハムの各種ステータスも更新して保存する
+        Debug.Log("[Friend Ham]Closenessステータスを更新中...");
+        // ClosenessをLLMに計算させる
+        yield return StartCoroutine(
+        llmBridge.GetLLMStructuredOutputResponse(
+            name: "return_calculation",
+            description: "Returns the result of a calculation",
+            "以下の会話データから、ハムスターのClosenessを算出してください。(0~100の範囲で数値を返してください）\n" +
+            "会話データ:" +
+            // "• こうへいくんという名前のユーザーで、親しみやすい関係性を築いている\n• 家族でアウトレットに出かけ、紺色のニットのトップスを購入した\n• 新しい服の購入を喜んでおり、ファッションに関心がある様子" +
+            // "• こうへいくんとの楽しい会話の時間を共有し、お互いに幸せな気持ちになれる関係性を築いている\n• こうへいくんは「たのしいね」という素直で前向きな表現をする人柄である\n• 私たちの会話は温かく親しみやすい雰囲気で進行している" +
+            // "申し訳ないのですが、今回が私たちの最初の会話です。\n\nこれまでの会話履歴は：\n1. あなたが「はなせる？」と質問\n2. 私が「話せるよ！こうへいくん、元気だった？」と返答\n\nまだ会話が始まったばかりで、要約できる重要な思い出や情報は蓄積されていません。もう少し会話を続けてから、改めて要約をお願いしていただけますか？" +
+            // "• ユーザーは「こうへいくん」という名前で呼ばれることを好む\n• 日常的な挨拶として「こんにちは」を使用する\n• カジュアルで親しみやすいコミュニケーションスタイルを好む",
+            conversationHistory.MessagesToString() +
+            "\n会話前のCloseness:" + Closeness.ToString(),
+            onComplete: result => Closeness = Mathf.Clamp((int)result, 0, 100),
+            onError: error => Debug.LogError(error)
+        ));
+        Debug.Log($"[Friend Ham]ステータス更新完了: Closeness={Closeness}");
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness = Closeness);
+    }
 }

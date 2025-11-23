@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class LLMBridge : MonoBehaviour
@@ -244,6 +245,12 @@ public class LLMBridge : MonoBehaviour
         {
             messages.Clear();
         }
+
+        public string MessagesToString()
+        {
+            if (messages.Count == 0) return string.Empty;
+            return string.Join("\n", messages.Take(messages.Count - 1).Select(m => $"{m.role}: {m.content}"));
+        }
     }
 
     // private IEnumerator ExampleUsage()
@@ -305,6 +312,8 @@ public class LLMBridge : MonoBehaviour
         };
 
         string jsonRequest = JsonUtility.ToJson(request);
+        // リクエストボディの表示（デバッグ用）
+        Debug.Log($"Request Body(Structured output): {jsonRequest}");
 
         // UnityWebRequestの作成
         UnityWebRequest webRequest = new UnityWebRequest(CLAUDE_API_URL, "POST");
