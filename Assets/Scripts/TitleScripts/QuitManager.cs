@@ -19,6 +19,8 @@ public class QuitManager : MonoBehaviour
     // 終了時に実行する処理をリストで管理
     private List<IEnumerator> quitTasks = new List<IEnumerator>();
     private List<IEnumerator> return2TitleTasks = new List<IEnumerator>();
+    // loading panel
+    [SerializeField] private GameObject loadPanel;
 
     private void Awake()
     {
@@ -33,6 +35,14 @@ public class QuitManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        // シーン変化を監視
+        SceneManager.activeSceneChanged += OnSceneChanged;
+    }
+
+    private void OnSceneChanged(Scene pre, Scene next)
+    {
+        // loading panelを非表示にする
+        loadPanel.SetActive(false);
     }
 
     // 終了処理を追加する
@@ -44,6 +54,9 @@ public class QuitManager : MonoBehaviour
     // 終了ボタンから呼ぶメソッド
     public void RequestQuit()
     {
+        // loading panelを表示する
+        loadPanel.SetActive(true);
+
         if (quitting) return;
 
         quitting = true;
@@ -59,6 +72,9 @@ public class QuitManager : MonoBehaviour
     // タイトルへ戻るボタンから呼ぶメソッド
     public void RequestReturn2Title()
     {
+        // loading panelを表示する
+        loadPanel.SetActive(true);
+
         if (return2title) return;
 
         return2title = true;

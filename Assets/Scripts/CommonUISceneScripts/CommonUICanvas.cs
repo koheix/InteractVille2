@@ -12,16 +12,30 @@ public class CommonUICanvas : MonoBehaviour
     private Canvas rootCanvas;
     private Button return2TitleButton;
 
+    // singleton
+    public static CommonUICanvas Instance { get; private set; }
+
     private void Awake()
     {
         rootCanvas = GetComponent<Canvas>();
+        // rootCanvasを非表示にしておく
+        // rootCanvas.enabled = false;
+        // Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
         return2TitleButton =  GetComponentInChildren<Button>();
         return2TitleButton.onClick.AddListener(() =>
         {
             QuitManager.Instance.RequestReturn2Title();
         });
-        // rootCanvas.enabled = false;
-        DontDestroyOnLoad(gameObject);
 
         // シーン変化を監視
         SceneManager.activeSceneChanged += OnSceneChanged;
