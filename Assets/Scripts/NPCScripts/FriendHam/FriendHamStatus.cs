@@ -49,7 +49,7 @@ public class FriendHamStatus : MonoBehaviour
     // public List<string> memory = new List<string>();
     // memory = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory);
     public List<string> memory;
-    private const int MaxMemorySize = 10;
+    private const int MaxMemorySize = 20; // 最大メモリ数
     private LLMBridge.ConversationHistory conversationHistory = new LLMBridge.ConversationHistory();
 
     //singleton化
@@ -91,6 +91,8 @@ public class FriendHamStatus : MonoBehaviour
             conversationLog.AddRange(conversationHistory.messages);
         }
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory = conversationLog);
+        conversationHistory.Clear();
+        
     }
 
     // Update is called once per frame
@@ -149,6 +151,7 @@ public class FriendHamStatus : MonoBehaviour
             "あなたは親しみやすい友達のハムスターです。\n" +
             "ただし、メッセージは1から3文程度の短い文章で答えてください。\n" +
             "また、メッセージのみで、描写は含めないでください。\n" + 
+            "現在時刻: " + TimeUtil.GetCurrentTimeString() + "\n" +
             "以下はこのユーザーとの会話でのあなたの記憶です。" + 
             string.Join("\n", memory) +
             "この情報を元に、以下のユーザーメッセージに返答してください。",  // システムメッセージ
@@ -204,7 +207,7 @@ public class FriendHamStatus : MonoBehaviour
         conversationHistory.AddUserMessage(message);
 
         IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
-            "会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
+            "最近の会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
             conversationHistory.ToArray(),  // 履歴全体を送信
             (partialText) =>
             {
@@ -216,8 +219,8 @@ public class FriendHamStatus : MonoBehaviour
         yield return StartCoroutine(responseCoroutine);
         Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
         // memoryに保存
-        memory.Add(finalResponse);
-        // 10個を超えたら古いものから削除
+        memory.Add(finalResponse + $" (この記憶の時間: {TimeUtil.GetCurrentTimeString()})");
+        // MaxMemorySize 個を超えたら古いものから削除
         if (memory.Count > MaxMemorySize)
         {
             memory.RemoveAt(0);

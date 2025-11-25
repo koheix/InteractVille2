@@ -236,9 +236,16 @@ public class LLMBridge : MonoBehaviour
             messages.Add(new Message { role = "assistant", content = content });
         }
 
-        public Message[] ToArray()
+        // 指定した数の最新メッセージを配列で取得
+        public Message[] ToArray(int count = 100)
         {
-            return messages.ToArray();
+            if (count <= 0)
+                return new Message[0];
+            
+            if (count >= messages.Count)
+                return messages.ToArray();
+            
+            return messages.Skip(messages.Count - count).ToArray();
         }
 
         public void Clear()

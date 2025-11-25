@@ -3,6 +3,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class DoorTrigger : MonoBehaviour
 {
@@ -52,7 +53,8 @@ public class DoorTrigger : MonoBehaviour
             }
             else
             {
-                ChangeScene();
+                // ChangeScene();
+                StartCoroutine(ChangeScene());
             }
         }
     }
@@ -72,16 +74,19 @@ public class DoorTrigger : MonoBehaviour
         // if need input key to enter
         if (requireInput && playerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            ChangeScene();
+            StartCoroutine(ChangeScene());
         }
     }
 
-    private void ChangeScene()
+    private IEnumerator ChangeScene()
     {
         //のちに非同期処理
         //UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
 
-        SceneManager.LoadScene(nextSceneName);
+        //データセーブ等
+        yield return StartCoroutine(QuitManager.Instance.RequestChangeSceneCoroutine(nextSceneName));
+
+        // SceneManager.LoadScene(nextSceneName);
     }
 
     private void ShowInteractionUI(bool show)
