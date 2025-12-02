@@ -1,20 +1,36 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
 
 public class ShopManager : MonoBehaviour
 {
     [Header("ショップに並ぶアイテム")]
     public List<ItemData> shopItems;
     private int appleCount = 0; // プレイヤーの所持リンゴ
+    public GameObject ItemButtonPrefab;   // アイテムボタンのプレハブ
+    public Transform itemListPanel; // ItemDisplayUI ( GridLayoutGroup のついたオブジェクト )
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("Buy Box UI References")]
+    // public GameObject buyBox;
+    // public TextMeshProUGUI buyBoxCharacterNameText;
+    public TextMeshProUGUI buyBoxDialogueText;
+    // public Button buyBoxYesButton;
+    // public Button buyBoxNoButton;
+
+
+    void OnEnable()
     {
         // プレイヤーのリンゴを取得
         appleCount = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.appleCount);
+        // QuitManager.Instance.AddQuitTask(SavePlayerData());
 
         // デバッグ用にショップアイテムを表示
         DisplayShopItems();
+
+        // アイテムリストをUIに表示
+        PopulateItemList(itemListPanel, ItemButtonPrefab, shopItems.Count);
+
     }
 
     // Update is called once per frame
@@ -70,5 +86,59 @@ public class ShopManager : MonoBehaviour
         // アプリケーション終了時に所持リンゴを保存
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
     }
+
+    // アイテムリストをUIに表示
+    void PopulateItemList(Transform panel, GameObject itemButtonPrefab, int itemCount)
+    {
+        for (int i = 0; i < itemCount; i++)
+        {
+            GameObject itemButtonObj = Instantiate(itemButtonPrefab, panel);
+            
+            // テスト用
+            var text = itemButtonObj.GetComponentInChildren<TextMeshProUGUI>();
+            if (text != null)
+            {
+                text.text = shopItems[i].itemName;
+            }
+            // 画像を設定
+            var iconImage = itemButtonObj.GetComponent<Image>();
+            if (iconImage != null)
+            {
+                iconImage.sprite = shopItems[i].icon;
+            }
+            // ボタンをクリックしたときのリスナーを設定
+            var button = itemButtonObj.GetComponent<Button>();
+            if (button != null)
+            {
+                int index = i; // ローカル変数にキャプチャ
+                button.onClick.AddListener(() => {
+                    // BuyItem(shopItems[index]);
+                    buyBoxDialogueText.text = $"{shopItems[index].itemName}は{shopItems[index].price}りんごでかえますよ！\nかいますか？";
+                    // アイテムを選択状態にする
+                    shopItems[index].isSelected = true;
+                    // 他のアイテムは選択解除
+                    for (int j = 0; j < shopItems.Count; j++)
+                    {
+                        if (j != index)
+                        {
+                            shopItems[j].isSelected = false;
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    // // プレイヤーデータを保存するコルーチン
+    // private IEnumerator SavePlayerData()
+    // {
+    //     Debug.Log("プレイヤーデータを保存中...");
+    //     // 所持リンゴ数を保存
+    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
+    //     yield return null; // 1フレーム待つ
+    //     // インベントリデータも保存する処理をここで追加
+    //     //
+    //     Debug.Log("プレイヤーデータの保存完了");
+    // }
 
 }

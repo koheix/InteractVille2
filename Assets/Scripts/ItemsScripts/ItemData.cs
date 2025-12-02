@@ -20,6 +20,9 @@ public class ItemData : ScriptableObject
     [Header("効果")]
     public int healAmount;  // 食べ物の回復量(精神的な)
     public int toolCnt; // 道具の使用回数
+
+    [Header("その他の属性")]
+    public bool isSelected = false; // 選択中かどうか
 }
 
 public enum ItemType
