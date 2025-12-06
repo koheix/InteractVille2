@@ -48,6 +48,7 @@ public class ShopperFSM
         {
             return EnterState(ShopState.Idle);
         }
+
     }
 
     DialogueLine[] EnterState(ShopState newState)

@@ -10,6 +10,7 @@ public class ShopManager : MonoBehaviour
     private int appleCount = 0; // プレイヤーの所持リンゴ
     public GameObject ItemButtonPrefab;   // アイテムボタンのプレハブ
     public Transform itemListPanel; // ItemDisplayUI ( GridLayoutGroup のついたオブジェクト )
+    private ItemData selectedItem = null; // 現在選択されているアイテム
 
     [Header("Buy Box UI References")]
     // public GameObject buyBox;
@@ -18,6 +19,14 @@ public class ShopManager : MonoBehaviour
     // public Button buyBoxYesButton;
     // public Button buyBoxNoButton;
 
+    [Header("Inventory Reference")]
+    public PlayerInventory playerInventory;
+
+    void Start()
+    {
+        // inventory参照の取得
+        playerInventory = PlayerInventory.Instance;
+    }
 
     void OnEnable()
     {
@@ -31,13 +40,22 @@ public class ShopManager : MonoBehaviour
         // アイテムリストをUIに表示
         PopulateItemList(itemListPanel, ItemButtonPrefab, shopItems.Count);
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        // アイテム保存メソッドの登録
+        QuitManager.Instance.AddQuitTask(SavePlayerData());
 
     }
+
+    // void OnDisable()
+    // {
+    //     // 所持リンゴ数を保存
+    //     // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
+    // }
+
+    // // Update is called once per frame
+    // void Update()
+    // {
+
+    // }
     // ショップアイテムを表示（デバッグ用）
     void DisplayShopItems()
     {
@@ -49,16 +67,25 @@ public class ShopManager : MonoBehaviour
     }
     
     // アイテムを購入
-    public bool BuyItem(ItemData item)
+    public bool BuyItem()
     {
-        if (appleCount >= item.price)
+        if(selectedItem == null)
         {
-            appleCount -= item.price;
+            Debug.Log("購入するアイテムが選択されていません！");
+            // 何もしない
+            return false;
+        }
+        if (appleCount >= selectedItem.price)
+        {
+            appleCount -= selectedItem.price;
+            // 所持リンゴ数を保存(UIに表示しているので即時保存する)
+            SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
             
-            Debug.Log($"{item.itemName}を購入しました！ 残金: {appleCount}円");
+            Debug.Log($"{selectedItem.itemName}を購入しました！ 残金: {appleCount}円");
             
             // ここでインベントリに追加する処理を呼ぶ
-            AddToInventory(item);
+            AddToInventory(selectedItem);
+
             
             return true;
         }
@@ -74,6 +101,7 @@ public class ShopManager : MonoBehaviour
     {
         // TODO: インベントリシステムと連携
         Debug.Log($"{item.itemName}をインベントリに追加");
+        playerInventory.AddItem(item, 1);
     }
 
     public int GetAppleCount()
@@ -81,11 +109,11 @@ public class ShopManager : MonoBehaviour
         return appleCount;
     }
     
-    void onApplicationQuit()
-    {
-        // アプリケーション終了時に所持リンゴを保存
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
-    }
+    // void onApplicationQuit()
+    // {
+    //     // アプリケーション終了時に所持リンゴを保存
+    //     // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
+    // }
 
     // アイテムリストをUIに表示
     void PopulateItemList(Transform panel, GameObject itemButtonPrefab, int itemCount)
@@ -112,33 +140,36 @@ public class ShopManager : MonoBehaviour
             {
                 int index = i; // ローカル変数にキャプチャ
                 button.onClick.AddListener(() => {
-                    // BuyItem(shopItems[index]);
                     buyBoxDialogueText.text = $"{shopItems[index].itemName}は{shopItems[index].price}りんごでかえますよ！\nかいますか？";
-                    // アイテムを選択状態にする
-                    shopItems[index].isSelected = true;
-                    // 他のアイテムは選択解除
-                    for (int j = 0; j < shopItems.Count; j++)
-                    {
-                        if (j != index)
-                        {
-                            shopItems[j].isSelected = false;
-                        }
-                    }
+                    // // アイテムを選択状態にする
+                    // shopItems[index].isSelected = true;
+                    selectedItem = shopItems[index];
+                    Debug.Log($"選択されたアイテム: {selectedItem.itemName}");
+
+                    // // 他のアイテムは選択解除
+                    // for (int j = 0; j < shopItems.Count; j++)
+                    // {
+                    //     if (j != index)
+                    //     {
+                    //         shopItems[j].isSelected = false;
+                    //     }
+                    // }
                 });
             }
         }
     }
 
-    // // プレイヤーデータを保存するコルーチン
-    // private IEnumerator SavePlayerData()
-    // {
-    //     Debug.Log("プレイヤーデータを保存中...");
-    //     // 所持リンゴ数を保存
-    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
-    //     yield return null; // 1フレーム待つ
-    //     // インベントリデータも保存する処理をここで追加
-    //     //
-    //     Debug.Log("プレイヤーデータの保存完了");
-    // }
+    // プレイヤーデータを保存するコルーチン
+    private System.Collections.IEnumerator SavePlayerData()
+    {
+        Debug.Log("プレイヤーデータを保存中...");
+        Debug.Log($"所持リンゴ数: {appleCount}");
+        // 所持リンゴ数を保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
+        yield return null; // 1フレーム待つ
+        // インベントリデータも保存する処理をここで追加
+        //
+        Debug.Log("プレイヤーデータの保存完了");
+    }
 
 }

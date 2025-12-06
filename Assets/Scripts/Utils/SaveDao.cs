@@ -10,6 +10,9 @@ public class PlayerData
     public int hunger = 100;
     public int appleCount = 0;
     public float[] lastPosition= {4f, 1.3f};
+    //インベントリデータ
+    public List<ItemData> inventoryItems = new List<ItemData>();
+
     // 友ハムのデータ
     public int friendHamValence = 50;
     public int friendHamArousal = 50;

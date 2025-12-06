@@ -1,13 +1,35 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
 
 public class PlayerInventory : MonoBehaviour
 {
     [Header("インベントリ")]
-    [SerializeField] private int itemCount = 0;
-    [SerializeField] private List<string> items = new List<string>();
+    [SerializeField] private List<ItemData> items = new List<ItemData>();
+
+    // アイテムボタンのプレハブ
+    [SerializeField] private GameObject itemButtonPrefab;
+
+    // インベントリのGridLayoutGroupにアイテムを表示するためのTransform
+    [SerializeField] private Transform inventoryPanel;
+
+    // singletonパターン
+    public static PlayerInventory Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     
-    public void AddItem(string itemName, int value)
+    public void AddItem(ItemData item, int value)
     {
         // if (itemName.Contains("りんご") || itemName.Contains("Apple"))
         // {
@@ -16,19 +38,54 @@ public class PlayerInventory : MonoBehaviour
         // }
         // else
         // {
-            items.Add(itemName);
-            Debug.Log($"{itemName}を取得しました！");
+            items.Add(item);
+            Debug.Log($"{item.itemName}を取得しました！");
         // }
         
         // UI更新など
-        UpdateUI();
+        // UpdateUI();
+        // 子のGridLayoutGroupにアイテムを追加表示
+        PopulateInventory(inventoryPanel, itemButtonPrefab, items.Count);
     }
     
-    private void UpdateUI()
+    // private void UpdateUI()
+    // {
+    //     // UI更新処理をここに
+    // }
+    
+    // public int GetitemCount() => itemCount;
+    // public List<string> GetItems() => new List<string>(items);
+
+    // アイテムリストをインベントリに表示
+    void PopulateInventory(Transform panel, GameObject itemButtonPrefab, int itemCount)
     {
-        // UI更新処理をここに
+        for (int i = 0; i < itemCount; i++)
+        {
+            GameObject itemButtonObj = Instantiate(itemButtonPrefab, panel);
+            
+            // テスト用
+            var text = itemButtonObj.GetComponentInChildren<TextMeshProUGUI>();
+            if (text != null)
+            {
+                text.text = items[i].itemName;
+            }
+            // 画像を設定
+            var iconImage = itemButtonObj.GetComponent<Image>();
+            if (iconImage != null)
+            {
+                iconImage.sprite = items[i].icon;
+            }
+            // // ボタンをクリックしたときのリスナーを設定
+            // var button = itemButtonObj.GetComponent<Button>();
+            // if (button != null)
+            // {
+            //     int index = i; // ローカル変数にキャプチャ
+            //     button.onClick.AddListener(() => {
+            //         buyBoxDialogueText.text = $"{shopItems[index].itemName}は{shopItems[index].price}りんごでかえますよ！\nかいますか？";
+            //         selectedItem = shopItems[index];
+            //         Debug.Log($"選択されたアイテム: {selectedItem.itemName}");
+            //     });
+            // }
+        }
     }
-    
-    public int GetitemCount() => itemCount;
-    public List<string> GetItems() => new List<string>(items);
 }

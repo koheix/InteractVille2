@@ -21,6 +21,7 @@ public class ShopperDialogueSystem : DialogueSystem
     public TextMeshProUGUI buyBoxDialogueText;
     public Button buyBoxYesButton;
     public Button buyBoxNoButton;
+    public Button returnButton;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -42,6 +43,22 @@ public class ShopperDialogueSystem : DialogueSystem
             // noButton.onClick.AddListener(NextLine);
             noButton.onClick.AddListener(() => OnClickYorNButton(noButton));
         }
+
+        // buyBoxのはいかいいえボタンにクリックイベントを追加
+        if (buyBoxYesButton != null)
+        {
+            buyBoxYesButton.onClick.AddListener(() => OnClickBuyBoxYorNButton(buyBoxYesButton));
+        }
+        if (buyBoxNoButton != null)
+        {
+            buyBoxNoButton.onClick.AddListener(() => OnClickBuyBoxYorNButton(buyBoxNoButton));
+        }
+
+        // buyBoxの戻るボタンにクリックイベントを追加
+        if (returnButton != null)
+        {
+            returnButton.onClick.AddListener(OnClickReturnButton);
+        }
     }
 
     public override void StartDialogue()
@@ -57,7 +74,9 @@ public class ShopperDialogueSystem : DialogueSystem
         Debug.Log("Clicked Button: " + clickedButton.name);
         bool isYes = (clickedButton == yesButton);
         dialogueLines = shopperFSM.changeState(isYes);
-        // 買い物状態の場合は商品を表示するなどの処理を追加
+        currentLineIndex = 0;
+        DisplayLine();
+                // 買い物状態の場合は商品を表示するなどの処理を追加
         if (shopperFSM.CurrentState == ShopState.BuyMenu)
         {
             // 商品リスト表示などの処理をここに追加
@@ -66,8 +85,11 @@ public class ShopperDialogueSystem : DialogueSystem
             dialogueBox.SetActive(false);
             buyBox.SetActive(true);
         }
-        currentLineIndex = 0;
-        DisplayLine();
+        else if (shopperFSM.CurrentState == ShopState.End)
+        {
+            dialogueLines = shopperFSM.changeState(isYes);
+            EndDialogue();
+        }
     }
 
     // buyboxのはいかいいえボタンがクリックされたときに呼び出される
@@ -80,7 +102,7 @@ public class ShopperDialogueSystem : DialogueSystem
         {
             Debug.Log("Player chose to buy the item.");
             // ここでshopManagerのBuyItemメソッドを呼び出すなどの処理を追加
-            // 例: shopManager.BuyItem(selectedItem);
+            shopManager.BuyItem();
         }
         else
         {
@@ -89,5 +111,26 @@ public class ShopperDialogueSystem : DialogueSystem
         dialogueLines = shopperFSM.changeState(isYes);
         currentLineIndex = 0;
         DisplayLine();
+        // 買い物状態が終了したら基本UIBOXを表示して買い物UIを非表示にする
+        if (shopperFSM.CurrentState == ShopState.End)
+        {
+            dialogueBox.SetActive(true);
+            buyBox.SetActive(false);
+        }
+    }
+
+    // buyboxの戻るボタンがクリックされたときに呼び出される
+    void OnClickReturnButton()
+    {
+        Debug.Log("Clicked Return Button");
+        dialogueLines = shopperFSM.changeState(false);
+        currentLineIndex = 0;
+        DisplayLine();
+        // 買い物状態が終了したら基本UIBOXを表示して買い物UIを非表示にする
+        if (shopperFSM.CurrentState == ShopState.End)
+        {
+            dialogueBox.SetActive(true);
+            buyBox.SetActive(false);
+        }
     }
 }

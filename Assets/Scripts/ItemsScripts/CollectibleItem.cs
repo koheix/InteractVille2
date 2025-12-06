@@ -6,9 +6,10 @@ using UnityEngine;
 public class CollectibleItem : MonoBehaviour
 {
     [Header("アイテム設定")]
-    [SerializeField] private string itemName = "Apple";
+    // [SerializeField] private string itemName = "Apple";
     [SerializeField] private int itemValue = 1;
     // [SerializeField] private AudioClip collectSound;
+    [SerializeField] private ItemData item;
     
     [Header("エフェクト")]
     // [SerializeField] private GameObject collectEffect;
@@ -69,7 +70,7 @@ public class CollectibleItem : MonoBehaviour
         PlayerInventory inventory = player.GetComponent<PlayerInventory>();
         if (inventory != null)
         {
-            inventory.AddItem(itemName, itemValue);
+            inventory.AddItem(item, itemValue);
         }
         //暫定的に実装（後で修正するかも）
         try
