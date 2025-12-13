@@ -44,18 +44,7 @@ public class ShopManager : MonoBehaviour
         QuitManager.Instance.AddQuitTask(SavePlayerData());
 
     }
-
-    // void OnDisable()
-    // {
-    //     // 所持リンゴ数を保存
-    //     // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
-    // }
-
-    // // Update is called once per frame
-    // void Update()
-    // {
-
-    // }
+    
     // ショップアイテムを表示（デバッグ用）
     void DisplayShopItems()
     {
@@ -108,12 +97,6 @@ public class ShopManager : MonoBehaviour
     {
         return appleCount;
     }
-    
-    // void onApplicationQuit()
-    // {
-    //     // アプリケーション終了時に所持リンゴを保存
-    //     // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
-    // }
 
     // アイテムリストをUIに表示
     void PopulateItemList(Transform panel, GameObject itemButtonPrefab, int itemCount)

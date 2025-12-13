@@ -44,6 +44,9 @@ public class FriendHamStatus : MonoBehaviour
         set { closeness = Mathf.Clamp(value, 0, 100); }
     }
 
+    // // 会話を一回でも行っているかのフラグ
+    // private bool hasConversated = false;
+
     // memory(ともハムの記憶を保存するための文字列リスト)
     // ゲームが終了するときに保存する(SaveDaoを使う)
     // public List<string> memory = new List<string>();
@@ -51,13 +54,6 @@ public class FriendHamStatus : MonoBehaviour
     public List<string> memory;
     private const int MaxMemorySize = 20; // 最大メモリ数
     private LLMBridge.ConversationHistory conversationHistory = new LLMBridge.ConversationHistory();
-
-    //singleton化
-    // public static FriendHamStatus Instance { get; private set; }
-    // private void Awake()
-    // {
-    //     DontDestroyOnLoad(gameObject);
-    // }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -100,43 +96,6 @@ public class FriendHamStatus : MonoBehaviour
     {
 
     }
-
-    // ともハムの発話メソッド
-    // public IEnumerator Speak(string message, System.Action<string> callback)
-    // {
-    //     // 発話処理
-    //     // 記憶と相手の発話内容に基づいて返事をする
-    //     Debug.Log("[Friend Ham]Sending request to Claude API...");
-
-    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(message, string.Join("\n", memory));
-    //     yield return StartCoroutine(responseCoroutine);
-
-    //     // レスポンスの取得
-    //     string response = responseCoroutine.Current as string;
-    //     // Debug.Log($"Claude Response: {response}");
-    //     // string result = "APIの結果"; // 実際はレスポンスを入れる
-    //     callback?.Invoke(response);
-    // }
-    // public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)
-    // {
-    //     Debug.Log("[Friend Ham]Sending request to Claude API...");
-
-    //     string finalResponse = "";
-
-    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
-    //         message,
-    //         string.Join("\n", memory),
-    //         (partialText) =>
-    //         {
-    //             finalResponse = partialText;
-    //             onUpdate?.Invoke(partialText);  // リアルタイム更新
-    //         }
-    //     );
-
-    //     yield return StartCoroutine(responseCoroutine);
-
-    //     onComplete?.Invoke(finalResponse);  // 完了時のコールバック
-    // }
 
     public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)
     {

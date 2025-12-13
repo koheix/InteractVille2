@@ -2,6 +2,14 @@ using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
 
+// アイテムとその個数を管理するクラス
+[System.Serializable]
+public class InventorySlot
+{
+    public ItemData item;
+    public int count;
+}
+
 //セーブデータ
 [System.Serializable]
 public class PlayerData
@@ -10,8 +18,10 @@ public class PlayerData
     public int hunger = 100;
     public int appleCount = 0;
     public float[] lastPosition= {4f, 1.3f};
-    //インベントリデータ
-    public List<ItemData> inventoryItems = new List<ItemData>();
+    //インベントリデータ(各アイテムの個数もここで管理する)
+    // public List<ItemData> inventoryItems = new List<ItemData>();
+    // public Dictionary<ItemData, int> inventoryItems = new Dictionary<ItemData, int>();
+    public List<InventorySlot> inventoryItems = new List<InventorySlot>();
 
     // 友ハムのデータ
     public int friendHamValence = 50;
