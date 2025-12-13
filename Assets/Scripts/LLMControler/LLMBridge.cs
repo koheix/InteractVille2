@@ -274,7 +274,7 @@ public class LLMBridge : MonoBehaviour
 
     // Structured Outputを使ったLLM応答を取得するmethod
     // とりあえず数値を返すものに対応
-    public IEnumerator GetLLMStructuredOutputResponse(string name, string description, string question, Action<float> onComplete, Action<string> onError)
+    public IEnumerator GetLLMStructuredOutputResponse(string resultType, string name, string description, string question, Action<float> onComplete, Action<string> onError)
     {
         // ツールの定義
         ClaudeTool[] tools = new ClaudeTool[]
@@ -292,8 +292,8 @@ public class LLMBridge : MonoBehaviour
                     {
                         result = new ToolProperty
                         {
-                            type = "number",
-                            description = "The numerical result"
+                            type = resultType,
+                            description = "The " + resultType + " result"
                         }
                     },
                     required = new string[] { "result" }
@@ -353,6 +353,14 @@ public class LLMBridge : MonoBehaviour
                     found = true;
                     break;
                 }
+                else if (block.type == "tool_use" && block.name == "return_mood")
+                {
+                    Debug.Log($"Structured Output Result: {block.input.result}");
+                    string result = block.input.result.ToString();
+                    onComplete?.Invoke(float.Parse(result));
+                    found = true;
+                    break;
+                }
             }
 
             if (!found)
@@ -369,4 +377,97 @@ public class LLMBridge : MonoBehaviour
 
         webRequest.Dispose();
     }
+
+    // // Structured Outputを使ったLLM応答を取得するmethod
+    // // stringを返すものに対応
+    // public IEnumerator GetLLMStructuredOutputStringResponse(string name, string description, string question, Action<string> onComplete, Action<string> onError)
+    // {
+    //     // ツールの定義
+    //     ClaudeTool[] tools = new ClaudeTool[]
+    //     {
+    //         new ClaudeTool
+    //         {
+    //             name = name,
+    //             description = description,
+    //             input_schema = new ToolInputSchema
+    //             {
+    //                 type = "object",
+    //                 properties = new ToolProperties
+    //                 {
+    //                     result = new ToolProperty
+    //                     {
+    //                         type = "string",
+    //                         description = "The string result"
+    //                     }
+    //                 },
+    //                 required = new string[] { "result" }
+    //             }
+    //         }
+    //     };
+
+    //     // リクエストの作成
+    //     ClaudeRequest request = new ClaudeRequest
+    //     {
+    //         model = "claude-sonnet-4-20250514",
+    //         max_tokens = 1024,
+    //         messages = new Message[]
+    //         {
+    //             new Message
+    //             {
+    //                 role = "user",
+    //                 content = question
+    //             }
+    //         },
+    //         tools = tools
+    //     };
+
+    //     string jsonRequest = JsonUtility.ToJson(request);
+    //     // リクエストボディの表示（デバッグ用）
+    //     Debug.Log($"Request Body(Structured output): {jsonRequest}");
+
+    //     // UnityWebRequestの作成
+    //     UnityWebRequest webRequest = new UnityWebRequest(CLAUDE_API_URL, "POST");
+    //     byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonRequest);
+    //     webRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+    //     webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+    //     // ヘッダーの設定
+    //     webRequest.SetRequestHeader("Content-Type", "application/json");
+    //     webRequest.SetRequestHeader("x-api-key", PlayerPrefs.GetString("APIKey"));
+    //     webRequest.SetRequestHeader("anthropic-version", CLAUDE_VERSION);
+    //     // リクエスト送信
+    //     yield return webRequest.SendWebRequest();
+    //     if (webRequest.result == UnityWebRequest.Result.Success)
+    //     {
+    //         string responseText = webRequest.downloadHandler.text;
+    //         ClaudeResponse response = JsonUtility.FromJson<ClaudeResponse>(responseText);
+
+    //         // ツール使用のブロックを探す
+    //         bool found = false;
+    //         foreach (var block in response.content)
+    //         {
+    //             if (block.type == "tool_use" && block.name == name)
+    //             {
+    //                 Debug.Log($"Structured Output Result: {block.input.result}");
+    //                 string result = block.input.result.ToString();
+    //                 onComplete?.Invoke(result);
+    //                 found = true;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (!found)
+    //         {
+    //             onError?.Invoke("Tool use not found in response");
+    //         }
+    //     }
+    //     else
+    //     {
+    //         string errorMessage = $"Error: {webRequest.error}\nResponse: {webRequest.downloadHandler.text}";
+    //         Debug.LogError(errorMessage);
+    //         onError?.Invoke(errorMessage);
+    //     }
+    //     webRequest.Dispose();
+    // }
+
 }

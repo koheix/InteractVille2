@@ -28,10 +28,15 @@ public class PlayerData
     public int friendHamArousal = 50;
     public int friendHamHunger = 50;
     public int friendHamCloseness = 50;
+
+    public string friendHamCurrentMood = "普通";
     public List<string> friendHamMemory = new List<string>();
 
     // 会話履歴
     public List<Message> conversationHistory = new List<Message>();
+
+    // メタデータ
+    public string lastPlayedDate = System.DateTime.Now.ToString(); // 要変更
 }
 
 

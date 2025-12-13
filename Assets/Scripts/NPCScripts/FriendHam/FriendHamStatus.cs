@@ -8,6 +8,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
 
 
 public class FriendHamStatus : MonoBehaviour
@@ -15,6 +17,10 @@ public class FriendHamStatus : MonoBehaviour
     // LLMBridgeの参照
     [Header("LLM Bridge Reference")]
     public LLMBridge llmBridge;
+
+    [Header("Friend Ham Status Reference")]
+    [SerializeField] private TextMeshProUGUI moodText;
+    [SerializeField] private Image closenessGauge;
 
     // valence(0 ~ 100で表現し、getterとsetterで制御する)
     private int valence = 50;
@@ -43,9 +49,12 @@ public class FriendHamStatus : MonoBehaviour
         get { return closeness; }
         set { closeness = Mathf.Clamp(value, 0, 100); }
     }
-
-    // // 会話を一回でも行っているかのフラグ
-    // private bool hasConversated = false;
+    private string currentMood = "普通";
+    public string CurrentMood
+    {
+        get { return currentMood; }
+        set { currentMood = value; }
+    }
 
     // memory(ともハムの記憶を保存するための文字列リスト)
     // ゲームが終了するときに保存する(SaveDaoを使う)
@@ -63,7 +72,9 @@ public class FriendHamStatus : MonoBehaviour
         arousal = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamArousal);
         hunger = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamHunger);
         closeness = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness);
-
+        currentMood = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCurrentMood);
+        UpdateMoodUI();
+        UpdateClosenessUI();
         // Debug.Log($"FriendHamStatus: Loaded memory count = {memory.Count}, Valence={Valence}, Arousal={Arousal}, Hunger={Hunger}");
     }
     void OnEnable()
@@ -73,21 +84,25 @@ public class FriendHamStatus : MonoBehaviour
         QuitManager.Instance.AddReturn2TitleTask(SaveValence());
         QuitManager.Instance.AddReturn2TitleTask(SaveArousal());
         QuitManager.Instance.AddReturn2TitleTask(SaveCloseness());
+        QuitManager.Instance.AddReturn2TitleTask(SaveCurrentMood());
     }
 
     void OnDisable()
     {
-        // 会話履歴を保存しておく
-        Debug.Log("FriendHamStatus: 会話履歴の保存");
-        List<Message> conversationLog = new List<Message>();
-        conversationLog = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory);
-        if (conversationHistory.messages.Count > 1)
-        {
+        // 会話をしていれば会話履歴を更新する
+        if (conversationHistory.messages.Count > 1){
+            // 会話履歴を保存しておく
+            Debug.Log("FriendHamStatus: 会話履歴の保存");
+            List<Message> conversationLog = new List<Message>();
+            conversationLog = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory);
+            // if (conversationHistory.messages.Count > 1)
+            // {
             conversationHistory.messages.RemoveAt(conversationHistory.messages.Count - 1);
             conversationLog.AddRange(conversationHistory.messages);
+            // }
+            SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory = conversationLog);
+            conversationHistory.Clear();
         }
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.conversationHistory = conversationLog);
-        conversationHistory.Clear();
         
     }
 
@@ -95,6 +110,21 @@ public class FriendHamStatus : MonoBehaviour
     void Update()
     {
 
+    }
+
+    // UIの機嫌表示を更新
+    public void UpdateMoodUI()
+    {
+        if (moodText != null)
+        {
+            moodText.text = CurrentMood;
+        }
+    }
+
+    // closenessのUIを更新するメソッド
+    private void UpdateClosenessUI()
+    {
+        closenessGauge.fillAmount = closeness / 100f;
     }
 
     public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)
@@ -113,7 +143,10 @@ public class FriendHamStatus : MonoBehaviour
             "現在時刻: " + TimeUtil.GetCurrentTimeString() + "\n" +
             "以下はこのユーザーとの会話でのあなたの記憶です。" + 
             string.Join("\n", memory) +
-            "この情報を元に、以下のユーザーメッセージに返答してください。",  // システムメッセージ
+            "前回の会話後のValence: " + Valence.ToString() + "\n" +
+            "前回の会話後のArousal: " + Arousal.ToString() + "\n" +
+            "前回の会話後のCloseness: " + Closeness.ToString() + "\n" +
+            "これらの情報を元に、以下のユーザーメッセージに返答してください。",  // システムメッセージ
             conversationHistory.ToArray(),  // 履歴全体を送信
             (partialText) =>
             {
@@ -154,6 +187,12 @@ public class FriendHamStatus : MonoBehaviour
     // ゲーム終了時に履歴をLLMに渡してメモリを保存する
     public IEnumerator SaveMemory()
     {
+        // 会話履歴が空の場合はスキップ
+        if(conversationHistory.messages.Count == 0)
+        {
+            Debug.Log("[Friend Ham]会話履歴が空のため、メモリ保存をスキップします。");
+            yield break;
+        }
         // LLMに履歴を渡してメモリを生成する
         Debug.Log("[Friend Ham]メモリを生成中...");
 
@@ -193,11 +232,18 @@ public class FriendHamStatus : MonoBehaviour
     // ゲーム終了時にValenceを保存する
     public IEnumerator SaveValence()
     {
+        // 会話履歴が空の場合はスキップ
+        if(conversationHistory.messages.Count == 0)
+        {
+            Debug.Log("[Friend Ham]会話履歴が空のため、Valence保存をスキップします。");
+            yield break;
+        }
         // 友ハムの各種ステータスも更新して保存する
         Debug.Log("[Friend Ham]Valenceステータスを更新中...");
         // ValenceをLLMに計算させる
         yield return StartCoroutine(
         llmBridge.GetLLMStructuredOutputResponse(
+            resultType: "number",
             name: "return_calculation",
             description: "Returns the result of a calculation",
             "以下の会話データから、ハムスターの感情価(Valence)を算出してください。(0~100の範囲で数値を返してください）\n" +
@@ -215,11 +261,18 @@ public class FriendHamStatus : MonoBehaviour
     // ゲーム終了時にArousalを保存する
     public IEnumerator SaveArousal()
     {
+        // 会話履歴が空の場合はスキップ
+        if(conversationHistory.messages.Count == 0)
+        {
+            Debug.Log("[Friend Ham]会話履歴が空のため、Arousal保存をスキップします。");
+            yield break;
+        }
         // 友ハムの各種ステータスも更新して保存する
         Debug.Log("[Friend Ham]Arousalステータスを更新中...");
         // ArousalをLLMに計算させる
         yield return StartCoroutine(
         llmBridge.GetLLMStructuredOutputResponse(
+            resultType: "number",
             name: "return_calculation",
             description: "Returns the result of a calculation",
             "以下の会話データから、ハムスターの覚醒度(Arousal)を算出してください。(0~100の範囲で数値を返してください）\n" +
@@ -236,11 +289,18 @@ public class FriendHamStatus : MonoBehaviour
     // ゲーム終了時にClosenessを保存する
     public IEnumerator SaveCloseness()
     {
+        // 会話履歴が空の場合はスキップ
+        if(conversationHistory.messages.Count == 0)
+        {
+            Debug.Log("[Friend Ham]会話履歴が空のため、Closeness保存をスキップします。");
+            yield break;
+        }
         // 友ハムの各種ステータスも更新して保存する
         Debug.Log("[Friend Ham]Closenessステータスを更新中...");
         // ClosenessをLLMに計算させる
         yield return StartCoroutine(
         llmBridge.GetLLMStructuredOutputResponse(
+            resultType: "number",
             name: "return_calculation",
             description: "Returns the result of a calculation",
             "以下の会話データから、ハムスターの親密度(Closeness)を算出してください。(0~100の範囲で数値を返してください）\n" +
@@ -253,5 +313,47 @@ public class FriendHamStatus : MonoBehaviour
         Debug.Log($"[Friend Ham]ステータス更新完了: Closeness={Closeness}");
         // SaveDaoを使って保存
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness = Closeness);
+    }
+
+    // ゲーム終了時にCurrentMoodを保存する
+    public IEnumerator SaveCurrentMood()
+    {
+        // 会話履歴が空の場合はスキップ
+        if(conversationHistory.messages.Count == 0)
+        {
+            Debug.Log("[Friend Ham]会話履歴が空のため、CurrentMood保存をスキップします。");
+            yield break;
+        }
+        // 友ハムの各種ステータスも更新して保存する
+        Debug.Log("[Friend Ham]CurrentMoodステータスを更新中...");
+        // CurrentMoodをLLMに計算させる
+        // yield return StartCoroutine(
+        // llmBridge.GetLLMStructuredOutputResponse(
+        //     resultType: "string",
+        //     name: "return_mood",
+        //     description: "Returns the current mood as a string",
+        //     "以下の会話データから、ハムスターの現在の機嫌(CurrentMood)を一言で表現してください。(例: '喜び', '悲しみ', '怒り'など）\n" +
+        //     "会話後のValence:" + Valence.ToString() +
+        //     "\n会話後のArousal:" + Arousal.ToString(),
+        //     onComplete: result => CurrentMood = result.ToString(),
+        //     onError: error => Debug.LogError(error)
+        // ));
+        yield return StartCoroutine(
+            llmBridge.GetLLMResponse(
+                "以下のValenceとArousalデータから、ハムスターの現在の感情を一言で表現してください。(例: '喜び', '悲しみ', '怒り'など）\n" +
+                "会話後のValence:" + Valence.ToString() +
+                "\n会話後のArousal:" + Arousal.ToString(),  // システムメッセージ
+                new Message[] {
+                    new Message {role = "user", content = "必ず4文字以内で、感情のみを回答してください。"}
+                },
+                (partialText) =>
+                {
+                    CurrentMood = partialText;
+                }
+            )
+        );
+        Debug.Log($"[Friend Ham]ステータス更新完了: CurrentMood={CurrentMood}");
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCurrentMood = CurrentMood);
     }
 }
