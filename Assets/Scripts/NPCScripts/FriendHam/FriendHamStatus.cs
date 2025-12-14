@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 
 public class FriendHamStatus : MonoBehaviour
@@ -80,10 +81,11 @@ public class FriendHamStatus : MonoBehaviour
     void OnEnable()
     {
         Debug.Log("FriendHamStatus: Registering SaveMemory task to QuitManager");
-        QuitManager.Instance.AddReturn2TitleTask(SaveMemory());
+        // QuitManager.Instance.AddReturn2TitleTask(SaveMemory());
+        QuitManager.Instance.AddReturn2TitleTask(SaveMemoryAndCloseness());
         QuitManager.Instance.AddReturn2TitleTask(SaveValence());
         QuitManager.Instance.AddReturn2TitleTask(SaveArousal());
-        QuitManager.Instance.AddReturn2TitleTask(SaveCloseness());
+        // QuitManager.Instance.AddReturn2TitleTask(SaveCloseness());
         QuitManager.Instance.AddReturn2TitleTask(SaveCurrentMood());
     }
 
@@ -141,6 +143,7 @@ public class FriendHamStatus : MonoBehaviour
             "ただし、メッセージは1から3文程度の短い文章で答えてください。\n" +
             "また、メッセージのみで、描写は含めないでください。\n" + 
             "現在時刻: " + TimeUtil.GetCurrentTimeString() + "\n" +
+            "前回の会話をした時間:" + ExtractDateTime(memory) + "\n" +
             "以下はこのユーザーとの会話でのあなたの記憶です。" + 
             string.Join("\n", memory) +
             "前回の会話後のValence: " + Valence.ToString() + "\n" +
@@ -185,15 +188,88 @@ public class FriendHamStatus : MonoBehaviour
     }
 
     // ゲーム終了時に履歴をLLMに渡してメモリを保存する
-    public IEnumerator SaveMemory()
+    // public IEnumerator SaveMemory()
+    // {
+    //     // 会話履歴が空の場合はスキップ
+    //     if(conversationHistory.messages.Count == 0)
+    //     {
+    //         Debug.Log("[Friend Ham]会話履歴が空のため、メモリ保存をスキップします。");
+    //         yield break;
+    //     }
+    //     // LLMに履歴を渡してメモリを生成する
+    //     Debug.Log("[Friend Ham]メモリを生成中...");
+
+    //     string finalResponse = "";
+        
+    //     // 要約支持を履歴に追加
+    //     string message = "これまでの会話履歴から、あなたとの重要な思い出や情報を3つ程度要約してメモリとして保存してください。" +
+    //                      "それぞれは短い文章で表現してください。" +
+    //                      "また、箇条書き形式で、その内容だけを出力してください。";
+    //     conversationHistory.AddUserMessage(message);
+
+    //     IEnumerator responseCoroutine = llmBridge.GetLLMResponse(
+    //         "最近の会話履歴から重要な情報を整理し、要約してください。",  // システムメッセージ
+    //         conversationHistory.ToArray(),  // 履歴全体を送信
+    //         (partialText) =>
+    //         {
+    //             finalResponse = partialText;
+    //         }
+    //         // stream: false  // ストリーミングは不要
+    //     );
+    //     // StartCoroutine(responseCoroutine);
+    //     yield return StartCoroutine(responseCoroutine);
+    //     Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
+    //     // memoryに保存
+    //     memory.Add(finalResponse + $"\n ({TimeUtil.GetCurrentTimeString()})");
+    //     // MaxMemorySize 個を超えたら古いものから削除
+    //     if (memory.Count > MaxMemorySize)
+    //     {
+    //         memory.RemoveAt(0);
+    //     }
+
+    //     // ここで履歴を保存する処理を追加
+    //     // SaveDaoを使って保存
+    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory = memory);
+    // }
+
+    public IEnumerator SaveMemoryAndCloseness()
     {
         // 会話履歴が空の場合はスキップ
         if(conversationHistory.messages.Count == 0)
         {
-            Debug.Log("[Friend Ham]会話履歴が空のため、メモリ保存をスキップします。");
+            Debug.Log("[Friend Ham]会話履歴が空のため、Closeness保存をスキップします。");
             yield break;
         }
-        // LLMに履歴を渡してメモリを生成する
+        // ---------------友ハムの親密度を更新して保存する
+        Debug.Log("[Friend Ham]Closenessステータスを更新中...");
+        // ClosenessをLLMに計算させる
+        yield return StartCoroutine(
+        llmBridge.GetLLMStructuredOutputResponse(
+            resultType: "number",
+            name: "return_calculation",
+            description: "Returns the result of a calculation",
+            "以下の会話データから、ハムスターの親密度(Closeness)を算出してください。(0~100の範囲で数値を返してください）\n" +
+            "最後に会話をしてから時間が経過していたら、経過している時間が長いほど親密度を下げてください。" +
+            "会話データ:" +
+            conversationHistory.MessagesToString() +
+            "\n最後に会話をした時間:" + ExtractDateTime(memory) + 
+            "\n現在の時間:" + TimeUtil.GetCurrentTimeString() +
+            "\n会話前のCloseness:" + Closeness.ToString(),
+            onComplete: result => Closeness = Mathf.Clamp((int)result, 0, 100),
+            onError: error => Debug.LogError(error)
+        ));
+        //
+        Debug.Log("以下の情報をもとにClosenessを計算しました: " +
+            "\n最後に会話をした時間:" + ExtractDateTime(memory) + 
+            "\n現在の時間:" + TimeUtil.GetCurrentTimeString() +
+            "\n会話前のCloseness:" + Closeness.ToString()
+        );
+        //
+        Debug.Log($"[Friend Ham]ステータス更新完了: Closeness={Closeness}");
+        // SaveDaoを使って保存
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness = Closeness);
+        // 親密度はこの会話より前のメモリを使用するので、メモリ保存は必ず後に処理する
+        // ---------------LLMに履歴を渡してメモリを生成する
         Debug.Log("[Friend Ham]メモリを生成中...");
 
         string finalResponse = "";
@@ -217,15 +293,14 @@ public class FriendHamStatus : MonoBehaviour
         yield return StartCoroutine(responseCoroutine);
         Debug.Log($"[Friend Ham]生成されたメモリ: {finalResponse}");
         // memoryに保存
-        memory.Add(finalResponse + $" (この記憶の時間: {TimeUtil.GetCurrentTimeString()})");
+        memory.Add(finalResponse + $"\n ({TimeUtil.GetCurrentTimeString()})");
         // MaxMemorySize 個を超えたら古いものから削除
         if (memory.Count > MaxMemorySize)
         {
             memory.RemoveAt(0);
         }
 
-        // ここで履歴を保存する処理を追加
-        // SaveDaoを使って保存
+        // ここで履歴を保存する
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamMemory = memory);
     }
 
@@ -287,32 +362,66 @@ public class FriendHamStatus : MonoBehaviour
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamArousal = Arousal);
     }
     // ゲーム終了時にClosenessを保存する
-    public IEnumerator SaveCloseness()
+    // public IEnumerator SaveCloseness()
+    // {
+    //     // 会話履歴が空の場合はスキップ
+    //     if(conversationHistory.messages.Count == 0)
+    //     {
+    //         Debug.Log("[Friend Ham]会話履歴が空のため、Closeness保存をスキップします。");
+    //         yield break;
+    //     }
+    //     // 友ハムの各種ステータスも更新して保存する
+    //     Debug.Log("[Friend Ham]Closenessステータスを更新中...");
+    //     // ClosenessをLLMに計算させる
+    //     yield return StartCoroutine(
+    //     llmBridge.GetLLMStructuredOutputResponse(
+    //         resultType: "number",
+    //         name: "return_calculation",
+    //         description: "Returns the result of a calculation",
+    //         "以下の会話データから、ハムスターの親密度(Closeness)を算出してください。(0~100の範囲で数値を返してください）\n" +
+    //         "最後に会話をしてから時間が経過していたら、経過している時間が長いほど親密度を下げてください。" +
+    //         "会話データ:" +
+    //         conversationHistory.MessagesToString() +
+    //         "\n最後に会話をした時間:" + ExtractDateTime(memory) + 
+    //         "\n現在の時間:" + TimeUtil.GetCurrentTimeString() +
+    //         "\n会話前のCloseness:" + Closeness.ToString(),
+    //         onComplete: result => Closeness = Mathf.Clamp((int)result, 0, 100),
+    //         onError: error => Debug.LogError(error)
+    //     ));
+    //     //
+    //     Debug.Log("以下の情報をもとにClosenessを計算しました: " +
+    //         "\n最後に会話をした時間:" + ExtractDateTime(memory) + 
+    //         "\n現在の時間:" + TimeUtil.GetCurrentTimeString() +
+    //         "\n会話前のCloseness:" + Closeness.ToString()
+    //     );
+    //     //
+    //     Debug.Log($"[Friend Ham]ステータス更新完了: Closeness={Closeness}");
+    //     // SaveDaoを使って保存
+    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness = Closeness);
+    // }
+
+    // memoryから最後の日時情報を抽出するヘルパーメソッド
+    private string ExtractDateTime(List<string> memory)
     {
-        // 会話履歴が空の場合はスキップ
-        if(conversationHistory.messages.Count == 0)
+        if (memory.Count == 0)
         {
-            Debug.Log("[Friend Ham]会話履歴が空のため、Closeness保存をスキップします。");
-            yield break;
+            return "なし";
         }
-        // 友ハムの各種ステータスも更新して保存する
-        Debug.Log("[Friend Ham]Closenessステータスを更新中...");
-        // ClosenessをLLMに計算させる
-        yield return StartCoroutine(
-        llmBridge.GetLLMStructuredOutputResponse(
-            resultType: "number",
-            name: "return_calculation",
-            description: "Returns the result of a calculation",
-            "以下の会話データから、ハムスターの親密度(Closeness)を算出してください。(0~100の範囲で数値を返してください）\n" +
-            "会話データ:" +
-            conversationHistory.MessagesToString() +
-            "\n会話前のCloseness:" + Closeness.ToString(),
-            onComplete: result => Closeness = Mathf.Clamp((int)result, 0, 100),
-            onError: error => Debug.LogError(error)
-        ));
-        Debug.Log($"[Friend Ham]ステータス更新完了: Closeness={Closeness}");
-        // SaveDaoを使って保存
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCloseness = Closeness);
+
+        string lastMemory = memory[memory.Count - 1];
+        
+        // 括弧内の日時を抽出する正規表現
+        // \(  - 開き括弧
+        // (.+?) - 括弧内の内容（非貪欲マッチ）
+        // \)  - 閉じ括弧
+        Match match = Regex.Match(lastMemory, @"\((.+?)\)$");
+        
+        if (match.Success)
+        {
+            return match.Groups[1].Value;
+        }
+        
+        return "なし(会話の記憶がありません)";
     }
 
     // ゲーム終了時にCurrentMoodを保存する

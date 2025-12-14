@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using System.Collections.Generic;
 
 public class TitleManager : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Button settingsCloseButton;
     [SerializeField] private TMP_InputField userNameInput;
+
+    [Header("日記表示用UI")]
+    [SerializeField] private TextMeshProUGUI diaryDisplayText;
     
     [Header("シーン設定")]
     [SerializeField] private string gameSceneName = "MainGameScene";
@@ -49,6 +53,35 @@ public class TitleManager : MonoBehaviour
         // 設定パネルを初期状態では非表示にする
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
+
+        if (userNameInput != null)
+        {
+            // プレイヤーの名前をロードして表示
+            userNameInput.text = PlayerPrefs.GetString("userName", "");
+
+            // 名前が入っていれば、ともハムの日記も表示する
+            if (diaryDisplayText != null && userNameInput.text != "")
+            {
+                List<string> diaryList = new List<string>();
+                diaryList = SaveDao.LoadData(
+                    userNameInput.text,
+                    PlayerData => PlayerData.friendHamMemory
+                );
+                // 最後の日記1件を表示
+                if (diaryList.Count > 0)
+                {
+                    diaryDisplayText.text = diaryList[diaryList.Count - 1];
+                }
+                else
+                {
+                    diaryDisplayText.text = "ともハムの日記:\nまだ日記はありません。";
+                }
+            }
+            else if (diaryDisplayText != null)
+            {
+                diaryDisplayText.text = "ともハムの日記:\n名前を入力してね！";
+            }
+        }
             
         // BGMの設定と再生
         SetupBGM();
@@ -166,13 +199,6 @@ public class TitleManager : MonoBehaviour
     private void OnExitButtonClicked()
     {
         QuitManager.Instance.RequestQuit();
-//         Debug.Log("ゲームを終了します");
-
-// #if UNITY_EDITOR
-//         UnityEditor.EditorApplication.isPlaying = false;
-// #else
-//             Application.Quit();
-// #endif
     }
     
     // BGM音量変更時の処理

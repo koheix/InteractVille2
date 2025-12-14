@@ -21846,6 +21846,7 @@ MonoBehaviour:
   shopItems:
   - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
   - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
+  - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
   ItemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
   itemListPanel: {fileID: 533615892}
   buyBoxDialogueText: {fileID: 701813776}
