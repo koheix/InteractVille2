@@ -7,8 +7,11 @@ using System.Linq;
 public class PlayerInventory : MonoBehaviour
 {
     [Header("インベントリ")]
-    [SerializeField] private List<ItemData> items = new List<ItemData>();
-    [SerializeField] private Dictionary<ItemData, int> inventoryItems = new Dictionary<ItemData, int>();
+    //すべてのアイテムを設定する
+    [SerializeField] private List<ItemData> allItems;
+    [SerializeField] private Dictionary<string, int> inventoryItems = new Dictionary<string, int>();
+
+    private List<string> items = new List<string>();
 
     // アイテムボタンのプレハブ
     [SerializeField] private GameObject itemButtonPrefab;
@@ -52,14 +55,14 @@ public class PlayerInventory : MonoBehaviour
         List<InventorySlot> inventoryData = SaveDao.LoadData(userName, data => data.inventoryItems);
         // inventoryItems = inventoryData.ToDictionary(slot => slot.item, slot => slot.count);
         // nullは除外する
-        inventoryItems = inventoryData.Where(slot => slot.item != null) .ToDictionary(slot => slot.item, slot => slot.count);
+        inventoryItems = inventoryData.Where(slot => slot.itemName != null) .ToDictionary(slot => slot.itemName, slot => slot.count);
         //
         // inventoryItems = new Dictionary<ItemData, int>(data.inventoryItems);
-        items = new List<ItemData>(inventoryItems.Keys);
+        items = new List<string>(inventoryItems.Keys);
         // デバッグ表示
         foreach (var item in items)
         {
-            Debug.Log($"Loaded item: {item.itemName}");
+            Debug.Log($"Loaded item: {item}");
         }
 
         // インベントリUIの更新
@@ -72,13 +75,13 @@ public class PlayerInventory : MonoBehaviour
     public void AddItem(ItemData item, int value)
     {
         // items.Add(item);
-        if (inventoryItems.ContainsKey(item))
+        if (inventoryItems.ContainsKey(item.itemName))
         {
-            inventoryItems[item] += value;
+            inventoryItems[item.itemName] += value;
         }
         else
         {
-            inventoryItems[item] = value;
+            inventoryItems[item.itemName] = value;
         }
         Debug.Log($"{item.itemName}を取得しました！");
         
@@ -102,7 +105,7 @@ public class PlayerInventory : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        items = new List<ItemData>(inventoryItems.Keys);
+        items = new List<string>(inventoryItems.Keys);
         for (int i = 0; i < itemCount; i++)
         {
             GameObject itemButtonObj = Instantiate(itemButtonPrefab, panel);
@@ -118,7 +121,11 @@ public class PlayerInventory : MonoBehaviour
             var iconImage = itemButtonObj.GetComponent<Image>();
             if (iconImage != null)
             {
-                iconImage.sprite = items[i].icon;
+                iconImage.sprite = allItems
+                // リストの中から、itemNameがitems[i]と完全に一致するものを探す
+                .Where(item => item.itemName == items[i])
+                // 条件に一致する最初の要素を取得（見つからない場合はnullを返す）
+                .FirstOrDefault().icon;
             }
         }
     }
@@ -131,7 +138,8 @@ public class PlayerInventory : MonoBehaviour
         // // SaveDao.UpdateData(userName, data => data.inventoryItems = new List<ItemData>(items));
         // SaveDao.UpdateData(userName, data => data.inventoryItems = new Dictionary<ItemData, int>(inventoryItems));
         var inventoryList = inventoryItems.Select(kvp => 
-            new InventorySlot { item = kvp.Key, count = kvp.Value }
+            // new InventorySlot { item = kvp.Key, count = kvp.Value }
+            new InventorySlot { itemName = kvp.Key, count = kvp.Value }
         ).ToList();
         SaveDao.UpdateData(userName, data => data.inventoryItems = inventoryList);
 

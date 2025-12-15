@@ -21395,7 +21395,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ba1ad782b04d8d4f93510d0e2349086, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  items: []
+  allItems:
+  - {fileID: 11400000, guid: 199adde755b02e244baa286c8e5f7266, type: 2}
+  - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
+  - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
+  - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
   itemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
   inventoryPanel: {fileID: 1348578055}
 --- !u!222 &951880165

@@ -6,7 +6,8 @@ using System.Collections.Generic;
 [System.Serializable]
 public class InventorySlot
 {
-    public ItemData item;
+    // public ItemData item;
+    public string itemName;
     public int count;
 }
 
