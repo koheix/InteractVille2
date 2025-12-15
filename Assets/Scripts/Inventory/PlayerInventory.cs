@@ -29,12 +29,14 @@ public class PlayerInventory : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        // インベントリデータの読み込み
+        LoadInventoryData();
     }
 
     void Start()
     {
-        // インベントリデータの読み込み
-        LoadInventoryData();
+        // // インベントリデータの読み込み
+        // LoadInventoryData();
         // QuitManagerに保存タスクを登録
         QuitManager.Instance.AddQuitTask(SaveInventoryData());
     }
@@ -47,8 +49,10 @@ public class PlayerInventory : MonoBehaviour
         // PlayerData data = SaveDao.LoadStructData(userName);
         // items = new List<ItemData>(data.inventoryItems);
         // インベントリの読み込みと変換
-        PlayerData loadedData = SaveDao.LoadStructData(userName);
-        inventoryItems = loadedData.inventoryItems.ToDictionary(slot => slot.item, slot => slot.count);
+        List<InventorySlot> inventoryData = SaveDao.LoadData(userName, data => data.inventoryItems);
+        // inventoryItems = inventoryData.ToDictionary(slot => slot.item, slot => slot.count);
+        // nullは除外する
+        inventoryItems = inventoryData.Where(slot => slot.item != null) .ToDictionary(slot => slot.item, slot => slot.count);
         //
         // inventoryItems = new Dictionary<ItemData, int>(data.inventoryItems);
         items = new List<ItemData>(inventoryItems.Keys);
@@ -89,43 +93,6 @@ public class PlayerInventory : MonoBehaviour
     // {
     //     // UI更新処理をここに
     // }
-    
-    // public int GetitemCount() => itemCount;
-    // public List<string> GetItems() => new List<string>(items);
-
-    // アイテムリストをインベントリに表示
-    // void PopulateInventory(Transform panel, GameObject itemButtonPrefab, int itemCount)
-    // {
-    //     items = new List<ItemData>(inventoryItems.Keys);
-    //     for (int i = 0; i < itemCount; i++)
-    //     {
-    //         GameObject itemButtonObj = Instantiate(itemButtonPrefab, panel);
-            
-    //         // テスト用
-    //         var text = itemButtonObj.GetComponentInChildren<TextMeshProUGUI>();
-    //         if (text != null)
-    //         {
-    //             text.text = items[i].itemName;
-    //         }
-    //         // 画像を設定
-    //         var iconImage = itemButtonObj.GetComponent<Image>();
-    //         if (iconImage != null)
-    //         {
-    //             iconImage.sprite = items[i].icon;
-    //         }
-    //         // // ボタンをクリックしたときのリスナーを設定
-    //         // var button = itemButtonObj.GetComponent<Button>();
-    //         // if (button != null)
-    //         // {
-    //         //     int index = i; // ローカル変数にキャプチャ
-    //         //     button.onClick.AddListener(() => {
-    //         //         buyBoxDialogueText.text = $"{shopItems[index].itemName}は{shopItems[index].price}りんごでかえますよ！\nかいますか？";
-    //         //         selectedItem = shopItems[index];
-    //         //         Debug.Log($"選択されたアイテム: {selectedItem.itemName}");
-    //         //     });
-    //         // }
-    //     }
-    // }
 
     void PopulateInventory(Transform panel, GameObject itemButtonPrefab, int itemCount)
     {
@@ -144,7 +111,8 @@ public class PlayerInventory : MonoBehaviour
             var text = itemButtonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
             {
-                text.text = $"{items[i].itemName} x{inventoryItems[items[i]]}";
+                // text.text = $"{items[i].itemName} x{inventoryItems[items[i]]}";
+                text.text = $"{inventoryItems[items[i]]}";
             }
             // 画像を設定
             var iconImage = itemButtonObj.GetComponent<Image>();

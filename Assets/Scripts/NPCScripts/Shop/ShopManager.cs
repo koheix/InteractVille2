@@ -105,11 +105,13 @@ public class ShopManager : MonoBehaviour
         {
             GameObject itemButtonObj = Instantiate(itemButtonPrefab, panel);
             
-            // テスト用
+            // 右下の個数表示をオフにする
             var text = itemButtonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
             {
-                text.text = shopItems[i].itemName;
+                // テスト用
+                // text.text = shopItems[i].itemName;
+                text.text = "";
             }
             // 画像を設定
             var iconImage = itemButtonObj.GetComponent<Image>();

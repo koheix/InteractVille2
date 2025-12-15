@@ -58,29 +58,29 @@ public class TitleManager : MonoBehaviour
         {
             // プレイヤーの名前をロードして表示
             userNameInput.text = PlayerPrefs.GetString("userName", "");
-
-            // 名前が入っていれば、ともハムの日記も表示する
-            if (diaryDisplayText != null && userNameInput.text != "")
-            {
-                List<string> diaryList = new List<string>();
-                diaryList = SaveDao.LoadData(
-                    userNameInput.text,
-                    PlayerData => PlayerData.friendHamMemory
-                );
-                // 最後の日記1件を表示
-                if (diaryList.Count > 0)
-                {
-                    diaryDisplayText.text = diaryList[diaryList.Count - 1];
-                }
-                else
-                {
-                    diaryDisplayText.text = "ともハムの日記:\nまだ日記はありません。";
-                }
-            }
-            else if (diaryDisplayText != null)
-            {
-                diaryDisplayText.text = "ともハムの日記:\n名前を入力してね！";
-            }
+            SetDiary(userNameInput.text);
+            // // 名前が入っていれば、ともハムの日記も表示する
+            // if (diaryDisplayText != null && userNameInput.text != "")
+            // {
+            //     List<string> diaryList = new List<string>();
+            //     diaryList = SaveDao.LoadData(
+            //         userNameInput.text,
+            //         PlayerData => PlayerData.friendHamMemory
+            //     );
+            //     // 最後の日記1件を表示
+            //     if (diaryList.Count > 0)
+            //     {
+            //         diaryDisplayText.text = diaryList[diaryList.Count - 1];
+            //     }
+            //     else
+            //     {
+            //         diaryDisplayText.text = "ともハムの日記:\nまだ日記はありません。";
+            //     }
+            // }
+            // else if (diaryDisplayText != null)
+            // {
+            //     diaryDisplayText.text = "ともハムの日記:\n名前を入力してね！";
+            // }
         }
             
         // BGMの設定と再生
@@ -88,6 +88,33 @@ public class TitleManager : MonoBehaviour
         
         // 設定値の読み込み
         LoadSettings();
+    }
+
+    // 日記の設定
+    private void SetDiary(string userName)
+    {
+        // 名前が入っていれば、ともハムの日記も表示する
+        if (diaryDisplayText != null && userName != "")
+        {
+            List<string> diaryList = new List<string>();
+            diaryList = SaveDao.LoadData(
+                userName,
+                PlayerData => PlayerData.friendHamMemory
+            );
+            // 最後の日記1件を表示
+            if (diaryList.Count > 0)
+            {
+                diaryDisplayText.text = diaryList[diaryList.Count - 1];
+            }
+            else
+            {
+                diaryDisplayText.text = "ともハムの日記:\nまだ日記はありません。";
+            }
+        }
+        else if (diaryDisplayText != null)
+        {
+            diaryDisplayText.text = "ともハムの日記:\n名前を入力してね！";
+        }
     }
     
     private void SetupBGM()
@@ -132,11 +159,16 @@ public class TitleManager : MonoBehaviour
             sfxVolumeSlider.value = sfxVolume;
             sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         }
-        
         // BGM音量を適用
         if (bgmAudioSource != null)
         {
             bgmAudioSource.volume = bgmVolume;
+        }
+
+        // 名前のinputのリスナーを設定
+        if (userNameInput != null)
+        {
+            userNameInput.onValueChanged.AddListener(OnUserNameChanged);
         }
     }
     
@@ -216,6 +248,12 @@ public class TitleManager : MonoBehaviour
         PlayerPrefs.SetFloat("SFXVolume", value);
         // ここでSFXの音量を更新する処理を追加
     }
+
+    // usernameinput変更時の処理（日記の反映)
+    private void OnUserNameChanged(string value)
+    {
+        SetDiary(value);
+    }
     
     private void SaveSettings()
     {
@@ -263,5 +301,7 @@ public class TitleManager : MonoBehaviour
             sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
         if (apiKeyInput != null)
             apiKeyInput.onValueChanged.RemoveListener(OnAPIKeyChanged);
+        if (userNameInput != null)
+            userNameInput.onValueChanged.RemoveListener(OnUserNameChanged);
     }
 }
