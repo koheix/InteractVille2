@@ -11,6 +11,14 @@ public class InventorySlot
     public int count;
 }
 
+// シーン名とゲーム終了時のハムスターの場所を管理するクラス
+[System.Serializable]
+public class LastPositionClass
+{
+    public string sceneName;
+    public float[] lastPosition;
+}
+
 //セーブデータ
 [System.Serializable]
 public class PlayerData
@@ -18,7 +26,17 @@ public class PlayerData
     public string name;
     public int hunger = 100;
     public int appleCount = 0;
-    public float[] lastPosition= {4f, 1.3f};
+    // ゲーム終了時のシーン名を記録しておく
+    public string lastSceneName = "MainGameScene";
+    // public float[] lastPosition= {4f, 1.3f};
+
+    // ゲーム終了時の位置を、シーン名ごとに保存する
+    public List<LastPositionClass> lastPostions =  new List<LastPositionClass>()
+    {
+        new LastPositionClass { sceneName = "MainGameScene", lastPosition = new float[] {4f, 1.3f} },
+        new LastPositionClass { sceneName = "HouseScene", lastPosition = new float[] {4f, 1.3f} },
+        new LastPositionClass { sceneName = "ShopScene", lastPosition = new float[] {4f, 1.3f} }
+    };
     //インベントリデータ(各アイテムの個数もここで管理する)
     // public List<ItemData> inventoryItems = new List<ItemData>();
     // public Dictionary<ItemData, int> inventoryItems = new Dictionary<ItemData, int>();

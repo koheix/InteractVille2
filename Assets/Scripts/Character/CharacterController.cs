@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 
 /*
@@ -9,11 +10,6 @@ characterの動きを制御するためのコード
 */
 public class CharacterController : MonoBehaviour
 {
-    // 常にデフォルトの場所でスポーンするためのオプション
-    [Header("テスト用")]
-    [SerializeField] private bool SetPlayerPosition = false;   
-    [SerializeField] private Vector2 PlayerPosition = new Vector2(4f, 1.3f);
-
     [Header("player speed")]
     [SerializeField] private float moveSpeed = 5f;
     private Animator animator;
@@ -33,20 +29,25 @@ public class CharacterController : MonoBehaviour
 
         // データから最後の位置を読み込んで設定
         Vector2 savedPosition = new Vector2();
-        savedPosition.x = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[0]);
-        savedPosition.y = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[1]);
+        // savedPosition.x = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[0]);
+        // savedPosition.y = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPosition[1]);
+        // ゲームをプレイしたことがあれば最後のシーンから再開する
+        List<LastPositionClass> positionData = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPostions);
+        // if (positionData != null)
+        // {
+        savedPosition.x = positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[0];
+        savedPosition.y = positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[1];
+        // }
+        // // ゲームが初プレイならメインゲームシーンにデフォルト座標でスポーンする
+
         transform.position = savedPosition;
-
-        // テスト用に特定の位置にセットするオプション
-        if (SetPlayerPosition)
-        {
-            transform.position = PlayerPosition;
-        }
-        // --------------------------------------
-
 
         // 初期位置を記録
         lastPosition = transform.position;
+
+        // プレイヤーの最後のシーンを記録する
+        QuitManager.Instance.AddReturn2TitleTask(SaveLastSceneName());
+        QuitManager.Instance.AddReturn2TitleTask(SavePlayerPosition());
     }
 
     void Update()
@@ -122,24 +123,58 @@ public class CharacterController : MonoBehaviour
         totalWalkDistance = 0f;
     }
 
-    void OnApplicationQuit()
-    {
-        // アプリケーション終了時に現在の位置を保存
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
-        {
-            data.lastPosition[0] = transform.position.x;
-            data.lastPosition[1] = transform.position.y;
-        });
-    }
+    // void OnApplicationQuit()
+    // {
+    //     // アプリケーション終了時に現在の位置を保存
+    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
+    //     {
+    //         data.lastPosition[0] = transform.position.x;
+    //         data.lastPosition[1] = transform.position.y;
+    //     });
+    // }
 
     // シーン切り替え時にプレイヤーの位置を記録
     void onDisable()
     {
-        // アプリケーション終了時にプレイヤーの位置を保存
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
-        {
-            data.lastPosition[0] = transform.position.x;
-            data.lastPosition[1] = transform.position.y;
-        });
+        // // アプリケーション終了時にプレイヤーの位置を保存
+        // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data =>
+        // {
+        //     data.lastPosition[0] = transform.position.x;
+        //     data.lastPosition[1] = transform.position.y;
+        // });
+        // 今のシーンのキャラクターの座標を記録する
+        // string nowSceneName = SceneManager.GetActiveScene().name;
+        // List<LastPositionClass> positionData = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPostions);
+        // positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[0] = transform.position.x;
+        // positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[1] = transform.position.y;
+        // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.lastPostions = positionData);
+    }
+
+    // シーンチェンジの際に、プレイヤーの最後の座標を記録する
+    public IEnumerator SavePlayerPosition()
+    {
+        Debug.Log("このシーンの最後の座標を記録中...");
+        // 今のシーンのキャラクターの座標を記録する
+        string nowSceneName = SceneManager.GetActiveScene().name;
+        List<LastPositionClass> positionData = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPostions);
+        positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[0] = transform.position.x;
+        // positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[1] = transform.position.y - 1.0f;
+        positionData.Find(x => x.sceneName == SceneManager.GetActiveScene().name).lastPosition[1] = transform.position.y;
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.lastPostions = positionData);
+        yield return null;
+        Debug.Log("プレイヤーの座標データの保存完了");
+    }
+
+    // // タイトルへ戻るときにシーン名とpositionを記録する
+    // タイトルへ戻るときにシーン名を記録する
+    public IEnumerator SaveLastSceneName()
+    {
+        // List<LastPositionClass> positionData = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), data => data.lastPostions);
+        // LastPositionClass lastPosition = positionData.Find
+        // SaveDao.LoadData<
+        // SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.LastPositions. = new LastPositionClass);
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.lastSceneName = SceneManager.GetActiveScene().name);
+        yield return null;
+        Debug.Log("最後のシーン名の保存完了");
     }
 }

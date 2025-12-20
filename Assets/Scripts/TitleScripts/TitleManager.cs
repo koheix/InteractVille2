@@ -27,8 +27,8 @@ public class TitleManager : MonoBehaviour
     [Header("日記表示用UI")]
     [SerializeField] private TextMeshProUGUI diaryDisplayText;
     
-    [Header("シーン設定")]
-    [SerializeField] private string gameSceneName = "MainGameScene";
+    // [Header("シーン設定")]
+    // [SerializeField] private string gameSceneName = "MainGameScene";
     
     void Start()
     {
@@ -196,7 +196,9 @@ public class TitleManager : MonoBehaviour
         StartCoroutine(FadeOutBGM(1.0f));
         
         // ゲームシーンに遷移
-        SceneManager.LoadScene(gameSceneName);
+        // 最後にタイトルに移動する前のシーンに遷移する
+        string lastSceneName = SaveDao.LoadData(PlayerPrefs.GetString("userName", default), PlayerData => PlayerData.lastSceneName);
+        SceneManager.LoadScene(lastSceneName);
     }
     
     // 設定ボタンクリック時の処理

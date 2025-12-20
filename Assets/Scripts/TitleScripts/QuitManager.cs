@@ -120,6 +120,9 @@ public class QuitManager : MonoBehaviour
     private IEnumerator Return2TitleFlow()
     {
         Debug.Log("タイトルへ戻る処理開始…");
+        // ↓キャラクターのところでやるべきか
+        // // 最後のシーン名と座標を記録
+        // SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), PlayerData => PlayerData.lastSceneName = SceneManager.GetActiveScene().name);
 
         // すべてのタスクを同時に開始
         List<Coroutine> runningCoroutines = new List<Coroutine>();
