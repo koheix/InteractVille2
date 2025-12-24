@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using TMPro;
 
 public class DoorTrigger : MonoBehaviour
 {
@@ -17,11 +18,18 @@ public class DoorTrigger : MonoBehaviour
     //whether player in range
     private bool playerInRange = false;
 
+    // Interaction UI
+    [SerializeField] private GameObject interactionPrompt;
+    [SerializeField] private TextMeshProUGUI promptText;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
         GetComponent<Collider2D>().isTrigger = true;
         prevSceneName = SceneManager.GetActiveScene().name;
+
+        // ヒントを非表示
+        interactionPrompt.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -74,14 +82,13 @@ public class DoorTrigger : MonoBehaviour
 
     private void ShowInteractionUI(bool show)
     {
-        GameObject.Find("InteractionUI").SetActive(show);
-        // if (show)
-        // {
-        //     GameObject.Find("InteractionUI").GetComponent<UnityEngine.UI.Text>().text = "Press Space to enter";
-        // }
-        // else
-        // {
-        //     GameObject.Find("InteractionUI").GetComponent<UnityEngine.UI.Text>().text = "";
-        // }
+        if (interactionPrompt == null) return;
+        
+        interactionPrompt.SetActive(show);
+        
+        if (show && promptText != null)
+        {
+            promptText.text = "スペースで移動";
+        }
     }
 }
