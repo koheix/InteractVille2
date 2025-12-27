@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 /**
  * プレイヤーがNPCに近づいたときにダイアログを開始するトリガースクリプト
@@ -11,14 +12,13 @@ public class DialogueTrigger : MonoBehaviour
     private bool isPlayerInRange = false;
 
     [Header("UI Prompt")]
-    public GameObject interactionPrompt; // "Eキーで話す"などの表示用
+    [SerializeField] private GameObject interactionPrompt; // "スペースで話す"の表示用
+    [SerializeField] private TextMeshProUGUI promptText;
 
     void Start()
     {
-        if (interactionPrompt != null)
-        {
-            interactionPrompt.SetActive(false);
-        }
+        // 初期状態でプロンプトを非表示
+        ShowInteractionUI(false);
     }
 
     void Update()
@@ -31,10 +31,7 @@ public class DialogueTrigger : MonoBehaviour
                 dialogueSystem.StartDialogue();
 
                 // プロンプトを非表示
-                if (interactionPrompt != null)
-                {
-                    interactionPrompt.SetActive(false);
-                }
+                ShowInteractionUI(false);
             }
         }
     }
@@ -46,10 +43,7 @@ public class DialogueTrigger : MonoBehaviour
             isPlayerInRange = true;
 
             // インタラクションプロンプトを表示
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(true);
-            }
+            ShowInteractionUI(true);
         }
     }
 
@@ -60,16 +54,26 @@ public class DialogueTrigger : MonoBehaviour
             isPlayerInRange = false;
 
             // プロンプトを非表示
-            if (interactionPrompt != null)
-            {
-                interactionPrompt.SetActive(false);
-            }
+            ShowInteractionUI(false);
 
             // ダイアログが進行中の場合は強制終了
             if (dialogueSystem != null)
             {
                 dialogueSystem.ForceEndDialogue();
             }
+        }
+    }
+
+    // プロンプトの表示・非表示を制御するメソッド
+    private void ShowInteractionUI(bool show)
+    {
+        if (interactionPrompt == null) return;
+        
+        interactionPrompt.SetActive(show);
+        
+        if (show && promptText != null)
+        {
+            promptText.text = "スペースで話す";
         }
     }
 }

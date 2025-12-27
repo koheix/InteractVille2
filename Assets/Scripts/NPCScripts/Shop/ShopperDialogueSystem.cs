@@ -76,7 +76,7 @@ public class ShopperDialogueSystem : DialogueSystem
         dialogueLines = shopperFSM.changeState(isYes);
         currentLineIndex = 0;
         DisplayLine();
-                // 買い物状態の場合は商品を表示するなどの処理を追加
+        // 買い物状態の場合は商品を表示するなどの処理を追加
         if (shopperFSM.CurrentState == ShopState.BuyMenu)
         {
             // 商品リスト表示などの処理をここに追加
