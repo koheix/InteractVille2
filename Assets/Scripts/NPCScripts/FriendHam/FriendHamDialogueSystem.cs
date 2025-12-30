@@ -13,8 +13,8 @@ public class FriendHamDialogueSystem : DialogueSystem
     public Button presentButton;
     public Button chatButton;
     public Button petButton;
-
-
+    // メニューに戻るためのボタン
+    public Button returnButton;
 
 
     [Header("Chatting Box UI References")]
@@ -22,8 +22,15 @@ public class FriendHamDialogueSystem : DialogueSystem
     public TMP_InputField chatInputField;
     public TextMeshProUGUI chattingCharacterNameText;
     public TextMeshProUGUI chattingText;
-    // メニューに戻るためのボタン
-    public Button returnButton;
+
+    [Header("Present Box UI References")]
+    public GameObject presentBox;
+    public GameObject itemListPanel;
+    public TextMeshProUGUI presentCharacterNameText;
+    public TextMeshProUGUI presentDialogueText;
+    public Button presentBoxYesButton;
+    public Button presentBoxNoButton;
+    public Button presentBoxReturnButton;
 
     [Header("FriendHam Status Reference")]
     public FriendHamStatus friendHamStatus;
@@ -44,21 +51,20 @@ public class FriendHamDialogueSystem : DialogueSystem
         // {
         //     pettingBox.SetActive(false);
         // }
-        // presentBoxは未実装
-        // if (presentBox != null)
-        // {
-        //     presentBox.SetActive(false); 
-        // }
+        if (presentBox != null)
+        {
+            presentBox.SetActive(false); 
+        }
         // quitButtonにクリックイベントを追加, 非表示にしておく
         if (quitButton != null)
         {
             quitButton.gameObject.SetActive(false);
             quitButton.onClick.AddListener(EndDialogue);
         }
-        // if (presentButton != null)
-        // {
-        //     presentButton.onClick.AddListener(OpenPresentBox);
-        // }
+        if (presentButton != null)
+        {
+            presentButton.onClick.AddListener(OpenPresentBox);
+        }
         if (chatButton != null)
         {
             chatButton.onClick.AddListener(OpenChattingBox);
@@ -75,6 +81,28 @@ public class FriendHamDialogueSystem : DialogueSystem
             returnButton.onClick.AddListener(() =>
             {
                 chattingBox.SetActive(false);
+                presentBox.SetActive(false);
+                dialogueBox.SetActive(true);
+            });
+        }
+
+        // presentBoxのはいかいいえボタンにクリックイベントを追加
+        if (presentBoxYesButton != null)
+        {
+            presentBoxYesButton.onClick.AddListener(() => OnClickPresentBoxYorNButton(presentBoxYesButton));
+        }
+        if (presentBoxNoButton != null)
+        {
+            presentBoxNoButton.onClick.AddListener(() => OnClickPresentBoxYorNButton(presentBoxNoButton));
+        }
+
+        // presentBoxの戻るボタンにクリックイベントを追加
+        if (presentBoxReturnButton != null)
+        {
+            presentBoxReturnButton.onClick.AddListener(() =>
+            {
+                chattingBox.SetActive(false);
+                presentBox.SetActive(false);
                 dialogueBox.SetActive(true);
             });
         }
@@ -102,7 +130,7 @@ public class FriendHamDialogueSystem : DialogueSystem
     {
         base.EndDialogue();
         // pettingBox.SetActive(false);
-        // presentBox.SetActive(false);
+        presentBox.SetActive(false);
         chattingBox.SetActive(false);
         quitButton.gameObject.SetActive(false); // やめるボタンを非表示
     }
@@ -113,17 +141,24 @@ public class FriendHamDialogueSystem : DialogueSystem
         chattingBox.SetActive(true);
         dialogueBox.SetActive(false);
         // pettingBox.SetActive(false);
-        // presentBox.SetActive(false);
+        presentBox.SetActive(false);
     }
 
-    // // プレゼントボックスを開く（未実装）
-    // void OpenPresentBox()
-    // {
-    //     // presentBox.SetActive(true);
-    //     dialogueBox.SetActive(false);
-    //     chattingBox.SetActive(false);
-    //     pettingBox.SetActive(false);
-    // }
+    // プレゼントボックスを開く
+    void OpenPresentBox()
+    {
+        dialogueLines = friendHamFSM.EnterState(FriendHamState.Present);
+        presentBox.SetActive(true);
+        dialogueBox.SetActive(false);
+        chattingBox.SetActive(false);
+        // pettingBox.SetActive(false);
+        dialogueLines = friendHamFSM.EnterState(FriendHamState.Present);
+        presentDialogueText.text = dialogueLines[0].text;
+        presentCharacterNameText.text = dialogueLines[0].characterName;
+        // currentLineIndex = 0;
+        // DisplayLine();
+        // 商品の購入処理をここに追加
+    }
 
     // chat送信ボタンのイベント
     void OnSendButtonClicked()
@@ -162,6 +197,30 @@ public class FriendHamDialogueSystem : DialogueSystem
             // 入力フィールドをクリア
             chatInputField.text = "";
         }
+    }
+
+    // presentboxのはいかいいえボタンがクリックされたときに呼び出される
+    void OnClickPresentBoxYorNButton(Button clickedButton)
+    {
+        Debug.Log("Clicked presentBox Button: " + clickedButton.name);
+        bool isYes = (clickedButton == presentBoxYesButton);
+        if (isYes)
+        {
+            Debug.Log("Player chose to present the item.");
+            // ここでpresentManagerのpresentItemメソッドを呼び出すなどの処理を追加
+            // presentManager.PresentItem();
+        }
+        else
+        {
+            Debug.Log("Player chose not to present the item.");
+            // プレゼントしない場合、とりあえずもとに戻る
+        }
+        // present状態が終了したら基本UIBOXを表示してpresentUIを非表示にする
+        dialogueBox.SetActive(true);
+        presentBox.SetActive(false);
+        dialogueLines = friendHamFSM.EnterState(FriendHamState.Greeting);
+        currentLineIndex = 0;
+        DisplayLine();
     }
 
 }
