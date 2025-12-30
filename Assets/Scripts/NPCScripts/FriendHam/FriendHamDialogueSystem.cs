@@ -35,6 +35,9 @@ public class FriendHamDialogueSystem : DialogueSystem
     [Header("FriendHam Status Reference")]
     public FriendHamStatus friendHamStatus;
 
+    [Header("FriendHam Item Manager Reference")]
+    public FriendHamItemManager friendHamItemManager;
+
 
     private FriendHamFSM friendHamFSM = new FriendHamFSM();
 
@@ -209,6 +212,7 @@ public class FriendHamDialogueSystem : DialogueSystem
             Debug.Log("Player chose to present the item.");
             // ここでpresentManagerのpresentItemメソッドを呼び出すなどの処理を追加
             // presentManager.PresentItem();
+            friendHamItemManager.PresentItem();
         }
         else
         {

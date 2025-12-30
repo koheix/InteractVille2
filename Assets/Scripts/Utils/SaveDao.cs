@@ -43,6 +43,8 @@ public class PlayerData
     public List<InventorySlot> inventoryItems = new List<InventorySlot>();
 
     // 友ハムのデータ
+
+    public List<InventorySlot> friendHamInventoryItems = new List<InventorySlot>();
     public int friendHamValence = 50;
     public int friendHamArousal = 50;
     public int friendHamHunger = 50;

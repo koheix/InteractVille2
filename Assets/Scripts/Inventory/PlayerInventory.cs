@@ -10,6 +10,16 @@ public class PlayerInventory : MonoBehaviour
     //すべてのアイテムを設定する
     [SerializeField] private List<ItemData> allItems;
     [SerializeField] private Dictionary<string, int> inventoryItems = new Dictionary<string, int>();
+    // getter for inventoryItems
+    public Dictionary<string, int> GetInventoryDictionary()
+    {
+        return inventoryItems;
+    }
+    // setter for inventoryItems
+    public void SetInventoryDictionary(Dictionary<string, int> newInventory)
+    {
+        inventoryItems = newInventory;
+    }
 
     private List<string> items = new List<string>();
 
@@ -45,7 +55,7 @@ public class PlayerInventory : MonoBehaviour
     }
 
     // インベントリデータの読み込み
-    private void LoadInventoryData()
+    public void LoadInventoryData()
     {
         Debug.Log("インベントリデータを読み込み中...");
         string userName = PlayerPrefs.GetString("userName", "default");
@@ -131,7 +141,7 @@ public class PlayerInventory : MonoBehaviour
     }
 
     // プレイヤーのインベントリデータを保存するコルーチン
-    private System.Collections.IEnumerator SaveInventoryData()
+    public System.Collections.IEnumerator SaveInventoryData()
     {
         Debug.Log("インベントリデータを保存中...");
         string userName = PlayerPrefs.GetString("userName", "default");

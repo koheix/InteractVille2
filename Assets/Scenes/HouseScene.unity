@@ -24612,6 +24612,7 @@ MonoBehaviour:
   presentBoxNoButton: {fileID: 487555519}
   presentBoxReturnButton: {fileID: 71116572}
   friendHamStatus: {fileID: 1623401594}
+  friendHamItemManager: {fileID: 2039368962}
 --- !u!1 &1151710287
 GameObject:
   m_ObjectHideFlags: 0
@@ -29686,6 +29687,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2039368961}
+  - component: {fileID: 2039368962}
   m_Layer: 6
   m_Name: FriendHamItemManager
   m_TagString: Untagged
@@ -29708,6 +29710,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1538430094}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2039368962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039368960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 344a5cd71e3f21b4e88d1e70083031f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allItems:
+  - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
+  - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
+  - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
+  playerInventory: {fileID: 1688660341}
+  itemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
+  presentBoxListPanel: {fileID: 516894198}
+  presentDialogueText: {fileID: 1151710289}
 --- !u!1 &2066989740
 GameObject:
   m_ObjectHideFlags: 0
