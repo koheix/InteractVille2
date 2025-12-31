@@ -24680,7 +24680,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -24697,8 +24697,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -24735,7 +24735,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 36.935356, z: 71.976395, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -25378,6 +25378,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
   - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
   - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
+  - {fileID: 11400000, guid: 67b459c9b96578d478f09097941c5690, type: 2}
   itemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
   inventoryPanel: {fileID: 1516299255}
 --- !u!222 &1688660342
@@ -29726,6 +29727,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bdbbc6c7567c51d45ad7735532b07642, type: 2}
   - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
   - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
+  - {fileID: 11400000, guid: 67b459c9b96578d478f09097941c5690, type: 2}
   playerInventory: {fileID: 1688660341}
   itemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
   presentBoxListPanel: {fileID: 516894198}

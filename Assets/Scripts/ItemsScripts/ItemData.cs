@@ -22,7 +22,7 @@ public class ItemData : ScriptableObject
     public int toolCnt; // 道具の使用回数
 
     [Header("その他の属性")]
-    public bool isSelected = false; // 選択中かどうか
+    public bool isSelected = false; // 選択中かどうか(ショップで)
 }
 
 public enum ItemType
