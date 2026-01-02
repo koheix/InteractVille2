@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class PlayerInventory : MonoBehaviour
 {
@@ -46,6 +47,12 @@ public class PlayerInventory : MonoBehaviour
         LoadInventoryData();
     }
 
+    // // パネルを更新するメソッド
+    // public void SetPanel(Transform newPanel)
+    // {
+    //     inventoryPanel = newPanel;
+    // }
+
     void Start()
     {
         // // インベントリデータの読み込み
@@ -53,6 +60,33 @@ public class PlayerInventory : MonoBehaviour
         // QuitManagerに保存タスクを登録
         QuitManager.Instance.AddQuitTask(SaveInventoryData());
     }
+
+//     private void OnEnable()
+//     {
+//         SceneManager.sceneLoaded += OnSceneLoaded;
+//     }
+
+//     // 無効になったときにイベントを解除（メモリリーク防止）
+//     private void OnDisable()
+//     {
+//         SceneManager.sceneLoaded -= OnSceneLoaded;
+//     }
+
+//     // シーンが読み込まれたときに呼ばれるメソッド
+//     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+//     {
+//         Debug.Log($"シーンが読み込まれました: {scene.name}");
+        
+//         // シーンチェンジするたびにinventoryPanelを更新する
+//         inventoryPanel = GameObject.Find("InventoryPanel").transform;
+//     }
+
+    // // シーンチェンジのイベント
+    // void OnEnable()
+    // {
+    //     // シーンチェンジするたびにinventoryPanelを更新する
+    //     inventoryPanel = GameObject.Find("InventoryPanel").transform;
+    // }
 
     // インベントリデータの読み込み
     public void LoadInventoryData()
@@ -110,6 +144,7 @@ public class PlayerInventory : MonoBehaviour
     void PopulateInventory(Transform panel, GameObject itemButtonPrefab, int itemCount)
     {
         // 既存のアイテム表示をクリア
+        //-------------------ここがエラーになるので要修正
         foreach (Transform child in panel)
         {
             Destroy(child.gameObject);

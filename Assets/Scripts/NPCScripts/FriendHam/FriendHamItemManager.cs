@@ -58,6 +58,14 @@ public class FriendHamItemManager : MonoBehaviour
 
     }
 
+    // void OnEnable()
+    // {
+    //     // インベントリデータの読み込み
+    //     LoadInventoryData();
+    //     // ともハムのインベントリデータの読み込み  
+    //     LoadPresentItemData();
+    // }
+
     // インベントリデータの読み込み
     private void LoadInventoryData()
     {

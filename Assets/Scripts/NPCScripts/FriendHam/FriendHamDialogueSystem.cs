@@ -160,7 +160,6 @@ public class FriendHamDialogueSystem : DialogueSystem
         presentCharacterNameText.text = dialogueLines[0].characterName;
         // currentLineIndex = 0;
         // DisplayLine();
-        // 商品の購入処理をここに追加
     }
 
     // chat送信ボタンのイベント
@@ -221,6 +220,7 @@ public class FriendHamDialogueSystem : DialogueSystem
         }
         // present状態が終了したら基本UIBOXを表示してpresentUIを非表示にする
         dialogueBox.SetActive(true);
+        Debug.Log("OK");
         presentBox.SetActive(false);
         dialogueLines = friendHamFSM.EnterState(FriendHamState.Greeting);
         currentLineIndex = 0;

@@ -42,6 +42,8 @@ public class FriendHamPutFurniture : MonoBehaviour
     {
         // ともハムのインベントリデータの読み込み
         LoadPresentItemData();
+        // isPlacedの初期化
+        isPlaced = SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.isFriendHamPlacedFurnitureNoticeShown);
         // 家具がおかれていたらポップアップを表示する
         NoticePutFurnitureCanvas.SetActive(isPlaced);
         // okButtonを押したときにポップアップを非表示にする
@@ -49,9 +51,14 @@ public class FriendHamPutFurniture : MonoBehaviour
         {
             // ポップアップを非表示にする
             NoticePutFurnitureCanvas.SetActive(false);
+            isPlaced = false;
+            SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.isFriendHamPlacedFurnitureNoticeShown = false);
         });
         // QuitManagerにともハムが家具を置く処理をセットする
         QuitManager.Instance.AddReturn2TitleTask(checkPutFurniture());
+
+        // ともハムが置いた家具をtilemapに復元する
+        refreshPlacedFurniture();
     }
 
     // 家具を置くか判定するメソッド
@@ -78,8 +85,9 @@ public class FriendHamPutFurniture : MonoBehaviour
     // gridに家具を置く処理（quitmanagerにセットしておく？）
     private IEnumerator PutFurniture(string itemName)
     {
+        // 家具を置いたお知らせをtrueにする
         isPlaced = true;
-        // Debug.Log("家具を置きました");
+        SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.isFriendHamPlacedFurnitureNoticeShown = true);
         // gridのともハムが家具を置くレイヤーにアイテムを置く
         ItemData furnitureItem = allFurnitureItems.Find(item => item.itemName == itemName);
         if (furnitureItem != null)
@@ -87,8 +95,8 @@ public class FriendHamPutFurniture : MonoBehaviour
             // SpriteをTileに変換して配置
             spriteToPlace = furnitureItem.icon;
             // x = -10から7まで、y=-3から3までの範囲でランダムな空いているセルを探して配置
-            var x = Random.Range(-10, 8);
-            var y = Random.Range(-3, 4);
+            int x = Random.Range(-10, 8);
+            int y = Random.Range(-3, 4);
             PlaceSpriteAsTile(new Vector3Int(x, y, 0), spriteToPlace);
             Debug.Log($"{itemName}をともハムが配置しました");
 
@@ -105,6 +113,12 @@ public class FriendHamPutFurniture : MonoBehaviour
                 new InventorySlot { itemName = kvp.Key, count = kvp.Value }
             ).ToList();
             SaveDao.UpdateData(userName, data => data.friendHamInventoryItems = friendHamItemsList);
+
+            // ともハムが置いた家具のデータも保存する
+            var placedFurnitureList = SaveDao.LoadData(userName, data => data.friendHamPlacedFurniture);;
+            placedFurnitureList.Add(new TileSaveData { position = new Vector3Int(x, y, 0), tileName = itemName });
+            SaveDao.UpdateData(userName, data => data.friendHamPlacedFurniture = placedFurnitureList);
+
             yield return null;
         }
         else
@@ -181,4 +195,24 @@ public class FriendHamPutFurniture : MonoBehaviour
 
     //     Debug.LogWarning("空いているセルが見つかりませんでした");
     // }
+
+    // ともハムが置いた家具をtilemapに復元する
+    private void refreshPlacedFurniture()
+    {
+        string userName = PlayerPrefs.GetString("userName", "default");
+        var placedFurnitureList = SaveDao.LoadData(userName, data => data.friendHamPlacedFurniture);
+        foreach (var furniture in placedFurnitureList)
+        {
+            ItemData furnitureItem = allFurnitureItems.Find(item => item.itemName == furniture.tileName);
+            if (furnitureItem != null)
+            {
+                PlaceSpriteAsTile(furniture.position, furnitureItem.icon);
+                Debug.Log($"ともハムが置いた家具 {furniture.tileName} を復元しました");
+            }
+            else
+            {
+                Debug.LogWarning($"家具アイテム {furniture.tileName} が見つかりませんでした");
+            }
+        }
+    }
 }

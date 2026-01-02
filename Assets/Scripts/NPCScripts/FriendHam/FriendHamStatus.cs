@@ -22,6 +22,7 @@ public class FriendHamStatus : MonoBehaviour
     [Header("Friend Ham Status Reference")]
     [SerializeField] private TextMeshProUGUI moodText;
     [SerializeField] private Image closenessGauge;
+    [SerializeField] private TextMeshProUGUI closenessGaugeText;
 
     // valence(0 ~ 100で表現し、getterとsetterで制御する)
     private int valence = 50;
@@ -127,6 +128,7 @@ public class FriendHamStatus : MonoBehaviour
     private void UpdateClosenessUI()
     {
         closenessGauge.fillAmount = closeness / 100f;
+        closenessGaugeText.text = closeness.ToString() + "％";
     }
 
     public IEnumerator Speak(string message, System.Action<string> onUpdate, System.Action<string> onComplete = null)

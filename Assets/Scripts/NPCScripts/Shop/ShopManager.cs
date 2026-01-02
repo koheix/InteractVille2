@@ -40,8 +40,8 @@ public class ShopManager : MonoBehaviour
         // アイテムリストをUIに表示
         PopulateItemList(itemListPanel, ItemButtonPrefab, shopItems.Count);
 
-        // アイテム保存メソッドの登録
-        QuitManager.Instance.AddQuitTask(SavePlayerData());
+        // // アイテム保存メソッドの登録
+        // QuitManager.Instance.AddReturn2TitleTask(SavePlayerData());
 
     }
     
@@ -75,6 +75,8 @@ public class ShopManager : MonoBehaviour
             // ここでインベントリに追加する処理を呼ぶ
             AddToInventory(selectedItem);
 
+            //インベントリデータの保存を行う
+            StartCoroutine(playerInventory.SaveInventoryData());
             
             return true;
         }
@@ -144,17 +146,17 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // プレイヤーデータを保存するコルーチン
-    private System.Collections.IEnumerator SavePlayerData()
-    {
-        Debug.Log("プレイヤーデータを保存中...");
-        Debug.Log($"所持リンゴ数: {appleCount}");
-        // 所持リンゴ数を保存
-        SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
-        yield return null; // 1フレーム待つ
-        // インベントリデータも保存する処理をここで追加
-        //
-        Debug.Log("プレイヤーデータの保存完了");
-    }
+    // // プレイヤーデータを保存するコルーチン
+    // private System.Collections.IEnumerator SavePlayerData()
+    // {
+    //     Debug.Log("プレイヤーデータを保存中...");
+    //     Debug.Log($"所持リンゴ数: {appleCount}");
+    //     // 所持リンゴ数を保存
+    //     SaveDao.UpdateData(PlayerPrefs.GetString("userName", default), data => data.appleCount = appleCount);
+    //     // インベントリデータも保存する処理をここで追加
+    //     playerInventory.SaveInventoryData();
+    //     yield return null; // 1フレーム待つ
+    //     Debug.Log("プレイヤーデータの保存完了");
+    // }
 
 }

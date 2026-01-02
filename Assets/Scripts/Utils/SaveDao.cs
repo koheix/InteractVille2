@@ -19,6 +19,13 @@ public class LastPositionClass
     public float[] lastPosition;
 }
 
+// ともハムが置いた家具を管理するクラス
+[System.Serializable]
+public class TileSaveData {
+    public Vector3Int position;
+    public string tileName; // ItemDataの名前をIDとして使う
+}
+
 //セーブデータ
 [System.Serializable]
 public class PlayerData
@@ -45,16 +52,27 @@ public class PlayerData
     // 友ハムのデータ
 
     public List<InventorySlot> friendHamInventoryItems = new List<InventorySlot>();
+    // ともハムが置いた家具のデータ
+    public List<TileSaveData> friendHamPlacedFurniture = new List<TileSaveData>();
+
+    // ともハムが家具を置いたお知らせの有無
+    public bool isFriendHamPlacedFurnitureNoticeShown = false;
+
+    // ともハムのステータス
     public int friendHamValence = 50;
     public int friendHamArousal = 50;
     public int friendHamHunger = 50;
     public int friendHamCloseness = 50;
 
     public string friendHamCurrentMood = "普通";
+
+    // プレゼントとか家具配置の思い出リスト(固定文字列で管理、（）で末端に時間記録) 
+    public List<string> friendHamActivityMemory = new List<string>();
     public List<string> friendHamMemory = new List<string>();
 
     // 会話履歴
     public List<Message> conversationHistory = new List<Message>();
+
 
     // メタデータ
     public string lastPlayedDate = System.DateTime.Now.ToString(); // 要変更
