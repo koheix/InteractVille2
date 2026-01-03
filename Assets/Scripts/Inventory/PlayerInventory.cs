@@ -28,7 +28,8 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private GameObject itemButtonPrefab;
 
     // インベントリのGridLayoutGroupにアイテムを表示するためのTransform
-    [SerializeField] private Transform inventoryPanel;
+    // [SerializeField] private Transform inventoryPanel;
+    private static Transform inventoryPanel;
 
     // singletonパターン
     public static PlayerInventory Instance { get; private set; }
@@ -38,6 +39,8 @@ public class PlayerInventory : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            // inventoryPanel = GetComponentInChildren<Panel>().transform;
+            inventoryPanel = GameObject.Find("InventoryPanel").transform;
         }
         else
         {
