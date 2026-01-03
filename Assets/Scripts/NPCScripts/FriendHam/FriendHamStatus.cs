@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 
 public class FriendHamStatus : MonoBehaviour
@@ -151,6 +152,9 @@ public class FriendHamStatus : MonoBehaviour
             "前回の会話後のValence: " + Valence.ToString() + "\n" +
             "前回の会話後のArousal: " + Arousal.ToString() + "\n" +
             "前回の会話後のCloseness: " + Closeness.ToString() + "\n" +
+            "以下はあなたのアクティビティ（家具を配置したことやプレイヤーにプレゼントされたものと時間）です。" +
+            // string.Join("\n", SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamActivityMemory)) + // 最新の3つ程度に制限する
+            string.Join("\n", SaveDao.LoadData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamActivityMemory).TakeLast(3).ToList()) +
             "これらの情報を元に、以下のユーザーメッセージに返答してください。",  // システムメッセージ
             conversationHistory.ToArray(),  // 履歴全体を送信
             (partialText) =>
@@ -467,4 +471,41 @@ public class FriendHamStatus : MonoBehaviour
         // SaveDaoを使って保存
         SaveDao.UpdateData(PlayerPrefs.GetString("userName", "default"), data => data.friendHamCurrentMood = CurrentMood);
     }
+
+    // // ともハムが食べ物を持っていて、満腹度が低い場合に食べさせるメソッド
+    // public IEnumerator TryFeedFriendHam(System.Action onComplete = null)
+    // {
+    //     FriendHamItemManager itemManager = FindObjectOfType<FriendHamItemManager>();
+    //     if (itemManager == null)
+    //     {
+    //         Debug.LogError("FriendHamItemManagerが見つかりません。");
+    //         yield break;
+    //     }
+
+    //     // 満腹度が50未満の場合に食べ物を探す
+    //     if (Hunger < 50)
+    //     {
+    //         foreach (var item in itemManager.friendHamItems)
+    //         {
+    //             string itemName = item.Key;
+    //             int itemCount = item.Value;
+
+    //             // foodItemsにitemNameが含まれているかチェック
+    //             bool isFood = itemManager.foodItems.Exists(foodItem => foodItem.itemName == itemName);
+
+    //             if (isFood && itemCount > 0)
+    //             {
+    //                 // 食べ物アイテムが見つかった場合、食べさせる
+    //                 Debug.Log($"ともハムに{itemName}を食べさせます。");
+    //                 // Hungerを20回復させる
+    //                 Hunger += 20;
+    //                 // 食べ物を1個減らす
+    //                 itemManager.RemoveItem(itemName, 1);
+    //                 // 食べたことを記録
+    //                 AddActivityMemory($"{itemName}が食べられた（{DateTime.Now}）");
+    //             }
+    //         }
+    //     }
+    //     onComplete?.Invoke();
+    // }
 }

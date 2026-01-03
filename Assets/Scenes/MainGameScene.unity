@@ -21369,8 +21369,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a1e5f35f7aea2904bae96912a710a17a, type: 2}
   - {fileID: 11400000, guid: 978b0534ef2cf3e459d532141112dc21, type: 2}
   - {fileID: 11400000, guid: 67b459c9b96578d478f09097941c5690, type: 2}
+  - {fileID: 11400000, guid: 87ac2db90fc8ccd4ca40abfc2a3877e1, type: 2}
+  - {fileID: 11400000, guid: f9c43222ba1a7b14bad939c550edaae9, type: 2}
   itemButtonPrefab: {fileID: 1423321946951147990, guid: 89fca3a476c533d47a2558b430a04e98, type: 3}
-  inventoryPanel: {fileID: 1348578055}
 --- !u!222 &951880165
 CanvasRenderer:
   m_ObjectHideFlags: 0

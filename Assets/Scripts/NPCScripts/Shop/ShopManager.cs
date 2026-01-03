@@ -77,6 +77,8 @@ public class ShopManager : MonoBehaviour
 
             //インベントリデータの保存を行う
             StartCoroutine(playerInventory.SaveInventoryData());
+
+            // selectedItem = null; // 選択状態を解除
             
             return true;
         }

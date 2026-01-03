@@ -127,6 +127,11 @@ public class FriendHamItemManager : MonoBehaviour
             presentItems[selectedItem.itemName] = 1;
         }
         Debug.Log($"{selectedItem.itemName}をともハムにプレゼントしました！");
+        // activity メモリを更新する(friendHamActivityMemoryに、「selectedItem.itemNameがプレゼントされた（時間）」)
+        SaveDao.UpdateData(
+            PlayerPrefs.GetString("userName", "default"), 
+            data => data.friendHamActivityMemory.Add($"{selectedItem.itemName}がプレゼントされた（{TimeUtil.GetCurrentTimeString()}）")
+        );
 
         // プレイヤーのインベントリからアイテムを減らす処理
         if (inventoryItems.ContainsKey(selectedItem.itemName))
@@ -205,7 +210,7 @@ public class FriendHamItemManager : MonoBehaviour
                     selectedItem = allItems.Where(item => item.itemName == items[index]).FirstOrDefault();
                     Debug.Log($"Clicked item: {selectedItem.itemName}");
                     // プレゼントボックスのテキストを更新
-                    presentDialogueText.text = $"{selectedItem}をともハムにプレゼントしますか？";
+                    presentDialogueText.text = $"{selectedItem.itemName}をともハムにプレゼントしますか？";
                 });
             }
         }

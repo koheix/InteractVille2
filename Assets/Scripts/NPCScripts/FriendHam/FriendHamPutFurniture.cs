@@ -119,6 +119,14 @@ public class FriendHamPutFurniture : MonoBehaviour
             placedFurnitureList.Add(new TileSaveData { position = new Vector3Int(x, y, 0), tileName = itemName });
             SaveDao.UpdateData(userName, data => data.friendHamPlacedFurniture = placedFurnitureList);
 
+            // 家具を置いたというアクティビティメモリを保存
+            // activity メモリを更新する(friendHamActivityMemoryに、「itemNameを部屋に置いた（時間）」)
+            SaveDao.UpdateData(
+                PlayerPrefs.GetString("userName", "default"), 
+                data => data.friendHamActivityMemory.Add($"{itemName}を部屋に置いた（{TimeUtil.GetCurrentTimeString()}）")
+            );
+
+
             yield return null;
         }
         else
