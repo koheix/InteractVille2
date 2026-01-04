@@ -40,9 +40,9 @@ public class PlayerData
     // ゲーム終了時の位置を、シーン名ごとに保存する
     public List<LastPositionClass> lastPostions =  new List<LastPositionClass>()
     {
-        new LastPositionClass { sceneName = "MainGameScene", lastPosition = new float[] {4f, 1.3f} },
-        new LastPositionClass { sceneName = "HouseScene", lastPosition = new float[] {4f, 1.3f} },
-        new LastPositionClass { sceneName = "ShopScene", lastPosition = new float[] {4f, 1.3f} }
+        new LastPositionClass { sceneName = "MainGameScene", lastPosition = new float[] {0.48f, -2.84f} },
+        new LastPositionClass { sceneName = "HouseScene", lastPosition = new float[] {0.48f, -2.84f} },
+        new LastPositionClass { sceneName = "ShopScene", lastPosition = new float[] {0.48f, -2.84f} }
     };
     //インベントリデータ(各アイテムの個数もここで管理する)
     // public List<ItemData> inventoryItems = new List<ItemData>();
@@ -76,6 +76,11 @@ public class PlayerData
 
     // メタデータ
     public string lastPlayedDate = System.DateTime.Now.ToString(); // 要変更
+
+    public bool isTutorialCompleted = false;
+
+    // ともハムハウスでのチュートリアル完了フラグ
+    public bool isFriendHamHouseTutorialCompleted = false;
 }
 
 
