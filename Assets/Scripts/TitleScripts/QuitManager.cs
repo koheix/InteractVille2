@@ -73,6 +73,9 @@ public class QuitManager : MonoBehaviour
         foreach (var task in quitTasks)
             yield return StartCoroutine(task);
 
+        // 最低2秒待つ
+        yield return new WaitForSeconds(2f);
+
         Debug.Log("終了処理完了");
         Application.Quit();
 
@@ -136,6 +139,8 @@ public class QuitManager : MonoBehaviour
         {
             yield return coroutine;
         }
+        // 最低2秒待つ
+        yield return new WaitForSeconds(2f);
 
         return2TitleTasks.Clear();
         return2title = false;
@@ -173,6 +178,8 @@ public class QuitManager : MonoBehaviour
         {
             yield return coroutine;
         }
+        // 最低2秒待つ
+        yield return new WaitForSeconds(2f);
 
         return2TitleTasks.Clear();
         changeScene = false;
